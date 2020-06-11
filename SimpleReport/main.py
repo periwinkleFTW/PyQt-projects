@@ -4,12 +4,13 @@ from PySide2.QtGui import *
 from PySide2.QtCore import *
 import sqlite3
 from PIL import Image
+import add_issue
 
 class Main(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("SimpleReport")
-        self.setWindowIcon(QIcon("assets/icons/logo-dark.png"))
+        #self.setWindowIcon(QIcon("assets/icons/logo-dark.png"))
         self.setGeometry(150, 150, 1470, 750)
         #self.setFixedSize(self.size())
 
@@ -32,7 +33,7 @@ class Main(QMainWindow):
         self.tabs.addTab(self.tab1, "Issues")
         self.tabs.addTab(self.tab2, "People")
         self.tabs.addTab(self.tab3, "Facilities")
-        self.tabs.addTab(self.tab4, "Statisticss")
+        #self.tabs.addTab(self.tab4, "Statisticss")
 
     def widgets(self):
         # Tab 1 (Issues) widgets ###########################################################
@@ -71,6 +72,7 @@ class Main(QMainWindow):
 
         # Buttons for actions on selected issues
         self.addIssue = QPushButton("Add issue")
+        self.addIssue.clicked.connect(self.funcAddIssue)
         self.viewIssue = QPushButton("View issue")
         self.editIssue = QPushButton("Edit issue")
         self.closeIssue = QPushButton("Close issue")
@@ -330,7 +332,8 @@ class Main(QMainWindow):
         self.facilitiesMainLayout.addWidget(self.facilitiesBottomGroupBox, 80)
         self.tab3.setLayout(self.facilitiesMainLayout)
 
-
+    def funcAddIssue(self):
+        self.newIssue = add_issue.AddIssue()
 
 
 
