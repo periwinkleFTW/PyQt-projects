@@ -27,10 +27,12 @@ class Main(QMainWindow):
         self.tab1 = QWidget()
         self.tab2 = QWidget()
         self.tab3 = QWidget()
+        self.tab4 = QWidget()
 
         self.tabs.addTab(self.tab1, "Issues")
         self.tabs.addTab(self.tab2, "People")
         self.tabs.addTab(self.tab3, "Facilities")
+        self.tabs.addTab(self.tab4, "Statisticss")
 
     def widgets(self):
         # Tab 1 (Issues) widgets ###########################################################
@@ -47,7 +49,8 @@ class Main(QMainWindow):
         self.closedIssuesRadioBtn = QRadioButton("Closed issues")
         self.listIssuesBtn = QPushButton("List issues")
 
-        # Bottom layout widget, a table showing issues
+        # Bottom layout widget
+        # Table showing issues
         self.issuesTable = QTableWidget()
         self.issuesTable.setColumnCount(14)
         #self.issuesTable.setColumnHidden(0, True)
@@ -65,6 +68,14 @@ class Main(QMainWindow):
         self.issuesTable.setHorizontalHeaderItem(11, QTableWidgetItem("Insp. Contr."))
         self.issuesTable.setHorizontalHeaderItem(12, QTableWidgetItem("Subcontr"))
         self.issuesTable.setHorizontalHeaderItem(13, QTableWidgetItem("Deadline"))
+
+        # Buttons for actions on selected issues
+        self.addIssue = QPushButton("Add issue")
+        self.viewIssue = QPushButton("View issue")
+        self.editIssue = QPushButton("Edit issue")
+        self.closeIssue = QPushButton("Close issue")
+        self.deleteIssue = QPushButton("Delete issue")
+
 
         # Tab 2 (People) widgets ###########################################################
         # Top layout (search people) widgets
@@ -98,6 +109,12 @@ class Main(QMainWindow):
         self.peopleTable.setHorizontalHeaderItem(7, QTableWidgetItem("Contractor"))
         self.peopleTable.setHorizontalHeaderItem(8, QTableWidgetItem("Subcontractor"))
 
+        # Buttons for actions on selected people
+        self.addPerson = QPushButton("Add person")
+        self.viewPerson = QPushButton("View person")
+        self.editPerson = QPushButton("Edit person")
+        self.deletePerson = QPushButton("Delete person")
+
         # Tab 3 (Facilities) widgets ###########################################################
         # Top layout (search facilities) widgets
         self.searchFacilitiesText = QLabel("Search facilities: ")
@@ -130,17 +147,37 @@ class Main(QMainWindow):
         self.facilitiesTable.setHorizontalHeaderItem(8, QTableWidgetItem("Total issues"))
         self.facilitiesTable.setHorizontalHeaderItem(9, QTableWidgetItem("Total inspections"))
 
+        # Buttons for actions on selected facilities
+        self.addFacility = QPushButton("Add facility")
+        self.viewFacility = QPushButton("View facility")
+        self.editFacility = QPushButton("Edit facility")
+        self.deleteFacility = QPushButton("Delete facility")
+
+        # Tab 4 (Statistics) widgets ###########################################################
+        self.totalIssuesLabel = QLabel()
+        self.totalPeopleLabel = QLabel()
+        self.totalOngoingIssuesLabel = QLabel()
+        self.totalLateIssuesLabel = QLabel()
+        self.totalClosedIssues = QLabel()
+
+
     def layouts(self):
         # Tab 1 (Issues) layouts ###########################################################
         self.issuesMainLayout = QVBoxLayout()
         self.issuesMainTopLayout = QHBoxLayout()
         self.issuesMainMiddleLayout = QHBoxLayout()
         self.issuesMainBottomLayout = QHBoxLayout()
+        self.issuesBottomRightLayout = QVBoxLayout()
+        self.issuesBottomLeftLayout = QHBoxLayout()
+        # Groupboxes allows customization using CSS-like syntax
         self.issuesTopGroupBox = QGroupBox("Search Box")
         self.issuesTopGroupBoxRightFiller = QGroupBox()
         self.issuesMiddleGroupBox = QGroupBox("List Box")
         self.issuesMiddleGroupBoxRightFiller = QGroupBox()
-        self.issuesBottomGroupBox = QGroupBox("Issues")
+        self.issuesBottomGroupBox = QGroupBox()
+        self.issuesBottomLeftGroupBox = QGroupBox("Issues")
+        self.issuesBottomRightGroupBox = QGroupBox("Actions")
+        self.issuesBottomRightGroupBoxFiller = QGroupBox()
 
         # Add widgets
         # Top layout (search box) widgets
@@ -160,12 +197,27 @@ class Main(QMainWindow):
         self.issuesMiddleGroupBox.setLayout(self.issuesMainMiddleLayout)
 
         # Bottom layout (table with facilities) widgets
-        self.issuesMainBottomLayout.addWidget(self.issuesTable)
+        # Bottom left layout with table
+        self.issuesBottomLeftLayout.addWidget(self.issuesTable)
+        self.issuesBottomLeftGroupBox.setLayout(self.issuesBottomLeftLayout)
+
+        # Bottom right layout with buttons
+        self.issuesBottomRightLayout.addWidget(self.addIssue, 5)
+        self.issuesBottomRightLayout.addWidget(self.viewIssue, 5)
+        self.issuesBottomRightLayout.addWidget(self.editIssue, 5)
+        self.issuesBottomRightLayout.addWidget(self.closeIssue, 5)
+        self.issuesBottomRightLayout.addWidget(self.deleteIssue, 5)
+        self.issuesBottomRightLayout.addWidget(self.issuesBottomRightGroupBoxFiller, 75)
+        self.issuesBottomRightGroupBox.setLayout(self.issuesBottomRightLayout)
+
+        self.issuesMainBottomLayout.addWidget(self.issuesBottomLeftGroupBox, 90)
+        self.issuesMainBottomLayout.addWidget(self.issuesBottomRightGroupBox, 10)
         self.issuesBottomGroupBox.setLayout(self.issuesMainBottomLayout)
 
         self.issuesMainLayout.addWidget(self.issuesTopGroupBox, 10)
         self.issuesMainLayout.addWidget(self.issuesMiddleGroupBox, 10)
         self.issuesMainLayout.addWidget(self.issuesBottomGroupBox, 80)
+
         self.tab1.setLayout(self.issuesMainLayout)
 
         # Tab 2 (People) layouts ###########################################################
@@ -173,11 +225,17 @@ class Main(QMainWindow):
         self.peopleMainTopLayout = QHBoxLayout()
         self.peopleMainMiddleLayout = QHBoxLayout()
         self.peopleMainBottomLayout = QHBoxLayout()
+        self.peopleBottomRightLayout = QVBoxLayout()
+        self.peopleBottomLeftLayout = QHBoxLayout()
+        # Groupboxes allows customization using CSS-like syntax
         self.peopleTopGroupBox = QGroupBox("Search Box")
         self.peopleTopGroupBoxRightFiller = QGroupBox()
         self.peopleMiddleGroupBox = QGroupBox("List Box")
         self.peopleMiddleGroupBoxRightFiller = QGroupBox()
-        self.peopleBottomGroupBox = QGroupBox("People")
+        self.peopleBottomGroupBox = QGroupBox()
+        self.peopleBottomLeftGroupBox = QGroupBox("People")
+        self.peopleBottomRightGroupBox = QGroupBox("Actions")
+        self.peopleBottomRightGroupBoxFiller = QGroupBox()
 
         # Top layout (search box) widgets
         self.peopleMainTopLayout.addWidget(self.searchPeopleText, 10)
@@ -196,12 +254,26 @@ class Main(QMainWindow):
         self.peopleMiddleGroupBox.setLayout(self.peopleMainMiddleLayout)
 
         # Bottom layout (table with issues) widgets
-        self.peopleMainBottomLayout.addWidget(self.peopleTable)
+        # Bottom left layout with table
+        self.peopleBottomLeftLayout.addWidget(self.peopleTable)
+        self.peopleBottomLeftGroupBox.setLayout(self.peopleBottomLeftLayout)
+
+        # Bottom right layout with buttons
+        self.peopleBottomRightLayout.addWidget(self.addPerson, 5)
+        self.peopleBottomRightLayout.addWidget(self.viewPerson, 5)
+        self.peopleBottomRightLayout.addWidget(self.editPerson, 5)
+        self.peopleBottomRightLayout.addWidget(self.deletePerson, 5)
+        self.peopleBottomRightLayout.addWidget(self.peopleBottomRightGroupBoxFiller, 75)
+        self.peopleBottomRightGroupBox.setLayout(self.peopleBottomRightLayout)
+
+        self.peopleMainBottomLayout.addWidget(self.peopleBottomLeftGroupBox, 90)
+        self.peopleMainBottomLayout.addWidget(self.peopleBottomRightGroupBox, 10)
         self.peopleBottomGroupBox.setLayout(self.peopleMainBottomLayout)
 
         self.peopleMainLayout.addWidget(self.peopleTopGroupBox, 10)
         self.peopleMainLayout.addWidget(self.peopleMiddleGroupBox, 10)
         self.peopleMainLayout.addWidget(self.peopleBottomGroupBox, 80)
+
         self.tab2.setLayout(self.peopleMainLayout)
 
         # Tab 3 (Facilities) layouts ###########################################################
@@ -209,11 +281,17 @@ class Main(QMainWindow):
         self.facilitiesMainTopLayout = QHBoxLayout()
         self.facilitiesMainMiddleLayout = QHBoxLayout()
         self.facilitiesMainBottomLayout = QHBoxLayout()
+        self.facilitiesBottomRightLayout = QVBoxLayout()
+        self.facilitiesBottomLeftLayout = QHBoxLayout()
+        # Groupboxes allows customization using CSS-like syntax
         self.facilitiesTopGroupBox = QGroupBox("Search Box")
         self.facilitiesTopGroupBoxRightFiller = QGroupBox()
         self.facilitiesMiddleGroupBox = QGroupBox("List Box")
         self.facilitiesMiddleGroupBoxRightFiller = QGroupBox()
-        self.facilitiesBottomGroupBox = QGroupBox("Facilities")
+        self.facilitiesBottomGroupBox = QGroupBox()
+        self.facilitiesBottomLeftGroupBox = QGroupBox("Facilities")
+        self.facilitiesBottomRightGroupBox = QGroupBox("Actions")
+        self.facilitiesBottomRightGroupBoxFiller = QGroupBox()
 
         # Top layout (search box) widgets
         self.facilitiesMainTopLayout.addWidget(self.searchFacilitiesText, 10)
@@ -231,13 +309,28 @@ class Main(QMainWindow):
         self.facilitiesMiddleGroupBox.setLayout(self.facilitiesMainMiddleLayout)
 
         # Bottom layout (table with facilities) widgets
-        self.facilitiesMainBottomLayout.addWidget(self.facilitiesTable)
+        # Bottom left layout with table
+        self.facilitiesBottomLeftLayout.addWidget(self.facilitiesTable)
+        self.facilitiesBottomLeftGroupBox.setLayout(self.facilitiesBottomLeftLayout)
+
+        # Bottom right layout with buttons
+        self.facilitiesBottomRightLayout.addWidget(self.addFacility, 5)
+        self.facilitiesBottomRightLayout.addWidget(self.viewFacility, 5)
+        self.facilitiesBottomRightLayout.addWidget(self.editFacility, 5)
+        self.facilitiesBottomRightLayout.addWidget(self.deleteFacility, 5)
+        self.facilitiesBottomRightLayout.addWidget(self.facilitiesBottomRightGroupBoxFiller, 75)
+        self.facilitiesBottomRightGroupBox.setLayout(self.facilitiesBottomRightLayout)
+
+        self.facilitiesMainBottomLayout.addWidget(self.facilitiesBottomLeftGroupBox, 90)
+        self.facilitiesMainBottomLayout.addWidget(self.facilitiesBottomRightGroupBox, 10)
         self.facilitiesBottomGroupBox.setLayout(self.facilitiesMainBottomLayout)
 
         self.facilitiesMainLayout.addWidget(self.facilitiesTopGroupBox, 10)
         self.facilitiesMainLayout.addWidget(self.facilitiesMiddleGroupBox, 10)
         self.facilitiesMainLayout.addWidget(self.facilitiesBottomGroupBox, 80)
         self.tab3.setLayout(self.facilitiesMainLayout)
+
+
 
 
 
