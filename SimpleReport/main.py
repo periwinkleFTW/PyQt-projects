@@ -4,7 +4,7 @@ from PySide2.QtGui import *
 from PySide2.QtCore import *
 import sqlite3
 from PIL import Image
-import add_issue
+import add_issue, add_person, add_facility
 
 class Main(QMainWindow):
     def __init__(self):
@@ -42,6 +42,7 @@ class Main(QMainWindow):
         self.searchIssuesEntry = QLineEdit()
         self.searchIssuesEntry.setPlaceholderText("Search issues..")
         self.searchIssuesBtn = QPushButton("Search")
+
 
         # Middle layout (list issues) widgets with radio buttons
         self.allIssuesRadioBtn = QRadioButton("All issues")
@@ -95,24 +96,26 @@ class Main(QMainWindow):
 
         # Bottom layout widget, a table showing people
         self.peopleTable = QTableWidget()
-        self.peopleTable.setColumnCount(9)
+        self.peopleTable.setColumnCount(8)
         #self.peopleTable.setColumnHidden(0, True)
         self.peopleTable.setHorizontalHeaderItem(0, QTableWidgetItem("ID"))
-        self.peopleTable.setHorizontalHeaderItem(1, QTableWidgetItem("Name"))
+        self.peopleTable.setHorizontalHeaderItem(1, QTableWidgetItem("First name"))
         self.peopleTable.horizontalHeader().setSectionResizeMode(1, QHeaderView.Stretch)
-        self.peopleTable.setHorizontalHeaderItem(2, QTableWidgetItem("Title"))
+        self.peopleTable.setHorizontalHeaderItem(2, QTableWidgetItem("Last name"))
+        self.peopleTable.horizontalHeader().setSectionResizeMode(1, QHeaderView.Stretch)
+        self.peopleTable.setHorizontalHeaderItem(3, QTableWidgetItem("Title"))
         self.peopleTable.horizontalHeader().setSectionResizeMode(2, QHeaderView.Stretch)
-        self.peopleTable.setHorizontalHeaderItem(3, QTableWidgetItem("Phone"))
+        self.peopleTable.setHorizontalHeaderItem(4, QTableWidgetItem("Phone"))
         self.peopleTable.horizontalHeader().setSectionResizeMode(3, QHeaderView.Stretch)
-        self.peopleTable.setHorizontalHeaderItem(4, QTableWidgetItem("Email"))
+        self.peopleTable.setHorizontalHeaderItem(5, QTableWidgetItem("Email"))
         self.peopleTable.horizontalHeader().setSectionResizeMode(4, QHeaderView.Stretch)
-        self.peopleTable.setHorizontalHeaderItem(5, QTableWidgetItem("Location"))
-        self.peopleTable.setHorizontalHeaderItem(6, QTableWidgetItem("Staff"))
-        self.peopleTable.setHorizontalHeaderItem(7, QTableWidgetItem("Contractor"))
-        self.peopleTable.setHorizontalHeaderItem(8, QTableWidgetItem("Subcontractor"))
+        self.peopleTable.setHorizontalHeaderItem(6, QTableWidgetItem("Location"))
+        self.peopleTable.setHorizontalHeaderItem(7, QTableWidgetItem("Employment type"))
+
 
         # Buttons for actions on selected people
         self.addPerson = QPushButton("Add person")
+        self.addPerson.clicked.connect(self.funcAddPerson)
         self.viewPerson = QPushButton("View person")
         self.editPerson = QPushButton("Edit person")
         self.deletePerson = QPushButton("Delete person")
@@ -151,6 +154,7 @@ class Main(QMainWindow):
 
         # Buttons for actions on selected facilities
         self.addFacility = QPushButton("Add facility")
+        self.addFacility.clicked.connect(self.funcAddFacility)
         self.viewFacility = QPushButton("View facility")
         self.editFacility = QPushButton("Edit facility")
         self.deleteFacility = QPushButton("Delete facility")
@@ -214,11 +218,12 @@ class Main(QMainWindow):
 
         self.issuesMainBottomLayout.addWidget(self.issuesBottomLeftGroupBox, 90)
         self.issuesMainBottomLayout.addWidget(self.issuesBottomRightGroupBox, 10)
-        self.issuesBottomGroupBox.setLayout(self.issuesMainBottomLayout)
+        #self.issuesBottomGroupBox.setLayout(self.issuesMainBottomLayout)
 
         self.issuesMainLayout.addWidget(self.issuesTopGroupBox, 10)
         self.issuesMainLayout.addWidget(self.issuesMiddleGroupBox, 10)
-        self.issuesMainLayout.addWidget(self.issuesBottomGroupBox, 80)
+        #self.issuesMainLayout.addWidget(self.issuesBottomGroupBox, 80)
+        self.issuesMainLayout.addLayout(self.issuesMainBottomLayout, 80)
 
         self.tab1.setLayout(self.issuesMainLayout)
 
@@ -270,11 +275,12 @@ class Main(QMainWindow):
 
         self.peopleMainBottomLayout.addWidget(self.peopleBottomLeftGroupBox, 90)
         self.peopleMainBottomLayout.addWidget(self.peopleBottomRightGroupBox, 10)
-        self.peopleBottomGroupBox.setLayout(self.peopleMainBottomLayout)
+        #self.peopleBottomGroupBox.setLayout(self.peopleMainBottomLayout)
 
         self.peopleMainLayout.addWidget(self.peopleTopGroupBox, 10)
         self.peopleMainLayout.addWidget(self.peopleMiddleGroupBox, 10)
-        self.peopleMainLayout.addWidget(self.peopleBottomGroupBox, 80)
+        #self.peopleMainLayout.addWidget(self.peopleBottomGroupBox, 80)
+        self.peopleMainLayout.addLayout(self.peopleMainBottomLayout, 80)
 
         self.tab2.setLayout(self.peopleMainLayout)
 
@@ -325,15 +331,23 @@ class Main(QMainWindow):
 
         self.facilitiesMainBottomLayout.addWidget(self.facilitiesBottomLeftGroupBox, 90)
         self.facilitiesMainBottomLayout.addWidget(self.facilitiesBottomRightGroupBox, 10)
-        self.facilitiesBottomGroupBox.setLayout(self.facilitiesMainBottomLayout)
+        #self.facilitiesBottomGroupBox.setLayout(self.facilitiesMainBottomLayout)
 
         self.facilitiesMainLayout.addWidget(self.facilitiesTopGroupBox, 10)
         self.facilitiesMainLayout.addWidget(self.facilitiesMiddleGroupBox, 10)
-        self.facilitiesMainLayout.addWidget(self.facilitiesBottomGroupBox, 80)
+        #self.facilitiesMainLayout.addWidget(self.facilitiesBottomGroupBox, 80)
+        self.facilitiesMainLayout.addLayout(self.facilitiesMainBottomLayout, 80)
+
         self.tab3.setLayout(self.facilitiesMainLayout)
 
     def funcAddIssue(self):
         self.newIssue = add_issue.AddIssue()
+
+    def funcAddPerson(self):
+        self.newPerson = add_person.AddPerson()
+
+    def funcAddFacility(self):
+        self.newFacility = add_facility.AddFacility()
 
 
 
