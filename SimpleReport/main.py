@@ -8,13 +8,14 @@ import add_issue, add_person, add_facility, backend
 
 db = backend.Database("simplereport-data.db")
 
+
 class Main(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("SimpleReport")
-        #self.setWindowIcon(QIcon("assets/icons/logo-dark.png"))
+        # self.setWindowIcon(QIcon("assets/icons/logo-dark.png"))
         self.setGeometry(150, 150, 1470, 750)
-        #self.setFixedSize(self.size())
+        # self.setFixedSize(self.size())
 
         self.UI()
         self.show()
@@ -38,7 +39,7 @@ class Main(QMainWindow):
         self.tabs.addTab(self.tab1, "Issues")
         self.tabs.addTab(self.tab2, "People")
         self.tabs.addTab(self.tab3, "Facilities")
-        #self.tabs.addTab(self.tab4, "Statisticss")
+        # self.tabs.addTab(self.tab4, "Statisticss")
 
     def widgets(self):
         # Tab 1 (Issues) widgets ###########################################################
@@ -47,7 +48,6 @@ class Main(QMainWindow):
         self.searchIssuesEntry = QLineEdit()
         self.searchIssuesEntry.setPlaceholderText("Search issues..")
         self.searchIssuesBtn = QPushButton("Search")
-
 
         # Middle layout (list issues) widgets with radio buttons
         self.allIssuesRadioBtn = QRadioButton("All issues")
@@ -60,7 +60,7 @@ class Main(QMainWindow):
         # Table showing issues
         self.issuesTable = QTableWidget()
         self.issuesTable.setColumnCount(14)
-        #self.issuesTable.setColumnHidden(0, True)
+        # self.issuesTable.setColumnHidden(0, True)
         self.issuesTable.setHorizontalHeaderItem(0, QTableWidgetItem("ID"))
         self.issuesTable.setHorizontalHeaderItem(1, QTableWidgetItem("Date"))
         self.issuesTable.setHorizontalHeaderItem(2, QTableWidgetItem("Priority"))
@@ -76,6 +76,9 @@ class Main(QMainWindow):
         self.issuesTable.setHorizontalHeaderItem(12, QTableWidgetItem("Subcontr"))
         self.issuesTable.setHorizontalHeaderItem(13, QTableWidgetItem("Deadline"))
 
+        # Double clicking a row opens a window with issue details
+        self.issuesTable.doubleClicked.connect(self.selectedIssue)
+
         # Buttons for actions on selected issues
         self.addIssue = QPushButton("Add issue")
         self.addIssue.clicked.connect(self.funcAddIssue)
@@ -83,7 +86,6 @@ class Main(QMainWindow):
         self.editIssue = QPushButton("Edit issue")
         self.closeIssue = QPushButton("Close issue")
         self.deleteIssue = QPushButton("Delete issue")
-
 
         # Tab 2 (People) widgets ###########################################################
         # Top layout (search people) widgets
@@ -102,7 +104,7 @@ class Main(QMainWindow):
         # Bottom layout widget, a table showing people
         self.peopleTable = QTableWidget()
         self.peopleTable.setColumnCount(8)
-        #self.peopleTable.setColumnHidden(0, True)
+        # self.peopleTable.setColumnHidden(0, True)
         self.peopleTable.setHorizontalHeaderItem(0, QTableWidgetItem("ID"))
         self.peopleTable.setHorizontalHeaderItem(1, QTableWidgetItem("First name"))
         self.peopleTable.horizontalHeader().setSectionResizeMode(1, QHeaderView.Stretch)
@@ -117,6 +119,8 @@ class Main(QMainWindow):
         self.peopleTable.setHorizontalHeaderItem(6, QTableWidgetItem("Location"))
         self.peopleTable.setHorizontalHeaderItem(7, QTableWidgetItem("Employment type"))
 
+        # Double clicking a row opens a window with person details
+        self.peopleTable.doubleClicked.connect(self.selectedPerson)
 
         # Buttons for actions on selected people
         self.addPerson = QPushButton("Add person")
@@ -157,6 +161,9 @@ class Main(QMainWindow):
         self.facilitiesTable.setHorizontalHeaderItem(8, QTableWidgetItem("Total issues"))
         self.facilitiesTable.setHorizontalHeaderItem(9, QTableWidgetItem("Total inspections"))
 
+        # Double clicking a row opens a window with person details
+        self.facilitiesTable.doubleClicked.connect(self.selectedFacility)
+
         # Buttons for actions on selected facilities
         self.addFacility = QPushButton("Add facility")
         self.addFacility.clicked.connect(self.funcAddFacility)
@@ -170,7 +177,6 @@ class Main(QMainWindow):
         self.totalOngoingIssuesLabel = QLabel()
         self.totalLateIssuesLabel = QLabel()
         self.totalClosedIssues = QLabel()
-
 
     def layouts(self):
         # Tab 1 (Issues) layouts ###########################################################
@@ -348,14 +354,13 @@ class Main(QMainWindow):
     def funcAddFacility(self):
         self.newFacility = add_facility.AddFacility()
 
-
-
+    # Populating tables
     def displayIssues(self):
         for i in reversed(range(self.issuesTable.rowCount())):
             self.issuesTable.removeRow(i)
 
         cur = db.cur
-        issues = cur.execute("SELECT * FROM people")
+        issues = cur.execute("SELECT * FROM issues")
 
         for row_data in issues:
             row_number = self.issuesTable.rowCount()
@@ -398,11 +403,70 @@ class Main(QMainWindow):
         self.facilitiesTable.setEditTriggers(QAbstractItemView.NoEditTriggers)
         self.facilitiesTable.setSelectionBehavior(QTableView.SelectRows)
 
+    # Selected items
+    def selectedIssue(self):
+        global issueId
+        listIssue = []
+
+        for i in range(0, self.issuesTable.columnCount()):
+            listIssue.append(self.issuesTable.item(self.issuesTable.currentRow(), i).text())
+
+        issueId = listIssue[0]
+        self.display = self.DisplayIssue()
+        self.display.show()
+
+    def selectedPerson(self):
+        global personId
+        listPerson = []
+        for i in range(0, self.peopleTable.columnCount()):
+            listPerson.append(self.peopleTable.item(self.peopleTable.currentRow(), i).text())
+        personId = listPerson[0]
+        self.displayPerson = DisplayPerson()
+        self.displayPerson.show()
+
+    def selectedFacility(self):
+        global facilityId
+        listFacility = []
+        for i in range(0, self.facilitiesTable.colorCount()):
+            listFacility.append(self.peopleTable.item(self.peopleTable.currentRow(), i).text())
+        personId = listFacility[0]
+        self.displayFacility = DisplayFacility()
+        self.displayFacility.show()
+
+
+class DisplayPerson(QWidget):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle("View person")
+        self.setWindowIcon(QIcon("assets/icons/logo-dark.png"))
+        self.setGeometry(450, 150, 750, 650)
+        self.UI()
+        self.show()
+
+    def UI(self):
+        pass
+
+
+
+
+class displayFacility(QWidget):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle("View facility")
+        self.setWindowIcon(QIcon("assets/icons/logo-dark.png"))
+        self.setGeometry(450, 150, 750, 650)
+        self.UI()
+        self.show()
+
+    def UI(self):
+        pass
+
 
 def main():
     app = QApplication(sys.argv)
     window = Main()
     sys.exit(app.exec_())
+
 
 if __name__ == "__main__":
     main()
