@@ -5,8 +5,8 @@ from PySide2.QtCore import *
 import sqlite3
 from PIL import Image
 
-conn = sqlite3.connect("simplereport-data.db")
-cur = conn.cursor()
+# conn = sqlite3.connect("simplereport-data.db")
+# cur = conn.cursor()
 
 defaultImg = "assets/icons/logo-dark.png"
 
@@ -140,7 +140,17 @@ class AddIssue(QWidget):
         self.setLayout(self.mainLayout)
 
 
+class DisplayIssue(QWidget):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle("View issue")
+        self.setWindowIcon(QIcon("assets/icons/logo-dark.png"))
+        self.setGeometry(450, 150, 750, 650)
+        self.UI()
+        self.show()
 
+    def UI(self):
+        pass
 
 
 

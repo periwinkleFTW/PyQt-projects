@@ -4,7 +4,9 @@ from PySide2.QtGui import *
 from PySide2.QtCore import *
 import sqlite3
 from PIL import Image
-import add_issue, add_person, add_facility
+import add_issue, add_person, add_facility, backend
+
+db = backend.Database("simplereport-data.db")
 
 class Main(QMainWindow):
     def __init__(self):
@@ -21,6 +23,9 @@ class Main(QMainWindow):
         self.tabWidget()
         self.widgets()
         self.layouts()
+        self.displayIssues()
+        self.displayPeople()
+        self.displayFacilities()
 
     def tabWidget(self):
         self.tabs = QTabWidget()
@@ -175,7 +180,7 @@ class Main(QMainWindow):
         self.issuesMainBottomLayout = QHBoxLayout()
         self.issuesBottomRightLayout = QVBoxLayout()
         self.issuesBottomLeftLayout = QHBoxLayout()
-        # Groupboxes allows customization using CSS-like syntax
+        # Groupboxes allow customization using CSS-like syntax
         self.issuesTopGroupBox = QGroupBox("Search Box")
         self.issuesTopGroupBoxRightFiller = QGroupBox()
         self.issuesMiddleGroupBox = QGroupBox("List Box")
@@ -218,11 +223,9 @@ class Main(QMainWindow):
 
         self.issuesMainBottomLayout.addWidget(self.issuesBottomLeftGroupBox, 90)
         self.issuesMainBottomLayout.addWidget(self.issuesBottomRightGroupBox, 10)
-        #self.issuesBottomGroupBox.setLayout(self.issuesMainBottomLayout)
 
         self.issuesMainLayout.addWidget(self.issuesTopGroupBox, 10)
         self.issuesMainLayout.addWidget(self.issuesMiddleGroupBox, 10)
-        #self.issuesMainLayout.addWidget(self.issuesBottomGroupBox, 80)
         self.issuesMainLayout.addLayout(self.issuesMainBottomLayout, 80)
 
         self.tab1.setLayout(self.issuesMainLayout)
@@ -275,11 +278,9 @@ class Main(QMainWindow):
 
         self.peopleMainBottomLayout.addWidget(self.peopleBottomLeftGroupBox, 90)
         self.peopleMainBottomLayout.addWidget(self.peopleBottomRightGroupBox, 10)
-        #self.peopleBottomGroupBox.setLayout(self.peopleMainBottomLayout)
 
         self.peopleMainLayout.addWidget(self.peopleTopGroupBox, 10)
         self.peopleMainLayout.addWidget(self.peopleMiddleGroupBox, 10)
-        #self.peopleMainLayout.addWidget(self.peopleBottomGroupBox, 80)
         self.peopleMainLayout.addLayout(self.peopleMainBottomLayout, 80)
 
         self.tab2.setLayout(self.peopleMainLayout)
@@ -331,11 +332,9 @@ class Main(QMainWindow):
 
         self.facilitiesMainBottomLayout.addWidget(self.facilitiesBottomLeftGroupBox, 90)
         self.facilitiesMainBottomLayout.addWidget(self.facilitiesBottomRightGroupBox, 10)
-        #self.facilitiesBottomGroupBox.setLayout(self.facilitiesMainBottomLayout)
 
         self.facilitiesMainLayout.addWidget(self.facilitiesTopGroupBox, 10)
         self.facilitiesMainLayout.addWidget(self.facilitiesMiddleGroupBox, 10)
-        #self.facilitiesMainLayout.addWidget(self.facilitiesBottomGroupBox, 80)
         self.facilitiesMainLayout.addLayout(self.facilitiesMainBottomLayout, 80)
 
         self.tab3.setLayout(self.facilitiesMainLayout)
@@ -349,6 +348,55 @@ class Main(QMainWindow):
     def funcAddFacility(self):
         self.newFacility = add_facility.AddFacility()
 
+
+
+    def displayIssues(self):
+        for i in reversed(range(self.issuesTable.rowCount())):
+            self.issuesTable.removeRow(i)
+
+        cur = db.cur
+        issues = cur.execute("SELECT * FROM people")
+
+        for row_data in issues:
+            row_number = self.issuesTable.rowCount()
+            self.issuesTable.insertRow(row_number)
+            for column_number, data in enumerate(row_data):
+                self.issuesTable.setItem(row_number, column_number, QTableWidgetItem(str(data)))
+
+        self.issuesTable.setEditTriggers(QAbstractItemView.NoEditTriggers)
+        self.issuesTable.setSelectionBehavior(QTableView.SelectRows)
+
+    def displayPeople(self):
+        for i in reversed(range(self.peopleTable.rowCount())):
+            self.peopleTable.removeRow(i)
+
+        cur = db.cur
+        people = cur.execute("SELECT * FROM people")
+
+        for row_data in people:
+            row_number = self.peopleTable.rowCount()
+            self.peopleTable.insertRow(row_number)
+            for column_number, data in enumerate(row_data):
+                self.peopleTable.setItem(row_number, column_number, QTableWidgetItem(str(data)))
+
+        self.peopleTable.setEditTriggers(QAbstractItemView.NoEditTriggers)
+        self.peopleTable.setSelectionBehavior(QTableView.SelectRows)
+
+    def displayFacilities(self):
+        for i in reversed(range(self.facilitiesTable.rowCount())):
+            self.facilitiesTable.removeRow(i)
+
+        cur = db.cur
+        facilities = cur.execute("SELECT * FROM facilities")
+
+        for row_data in facilities:
+            row_number = self.facilitiesTable.rowCount()
+            self.facilitiesTable.insertRow(row_number)
+            for column_number, data in enumerate(row_data):
+                self.facilitiesTable.setItem(row_number, column_number, QTableWidgetItem(str(data)))
+
+        self.facilitiesTable.setEditTriggers(QAbstractItemView.NoEditTriggers)
+        self.facilitiesTable.setSelectionBehavior(QTableView.SelectRows)
 
 
 def main():
