@@ -83,6 +83,7 @@ class Main(QMainWindow):
         self.addIssue = QPushButton("Add issue")
         self.addIssue.clicked.connect(self.funcAddIssue)
         self.viewIssue = QPushButton("View issue")
+        self.viewIssue.clicked.connect(self.selectedIssue)
         self.editIssue = QPushButton("Edit issue")
         self.closeIssue = QPushButton("Close issue")
         self.deleteIssue = QPushButton("Delete issue")
@@ -93,6 +94,7 @@ class Main(QMainWindow):
         self.searchPeopleEntry = QLineEdit()
         self.searchPeopleEntry.setPlaceholderText("Search people..")
         self.searchPeopleBtn = QPushButton("Search")
+        self.searchPeopleBtn.clicked.connect(self.searchPeople)
 
         # Middle layout (list people) widgets with radio buttons
         self.allPeopleRadioBtn = QRadioButton("All people")
@@ -136,6 +138,7 @@ class Main(QMainWindow):
         self.searchFacilitesEntry = QLineEdit()
         self.searchFacilitesEntry.setPlaceholderText("Search facilities..")
         self.searchFacilitiesBtn = QPushButton("Search")
+        self.searchFacilitiesBtn.clicked.connect(self.searchFacilities)
 
         # Middle layout (list people) widgets with radio buttons
         self.allFacilitiesRadioBtn = QRadioButton("All facilities")
@@ -435,6 +438,111 @@ class Main(QMainWindow):
         facilityId = listFacility[0]
         self.displayFacility = DisplayFacility()
         self.displayFacility.show()
+
+    # Search functions
+    def searchIssues(self):
+        value = self.searchIssuesEntry.text()
+        if value == "":
+            QMessageBox.information(self, "Warning", "Search string cannot be empty")
+            self.displayIssues()
+        else:
+            # Erase search entry
+            self.searchIssuesEntry.setText("")
+            query = "SELECT * FROM issues WHERE " \
+                    "issue_id LIKE ? " \
+                    "OR issue_date LIKE ?" \
+                    "OR issue_priority LIKE ?" \
+                    "OR issue_observer LIKE ?" \
+                    "OR issue_team LIKE ?" \
+                    "OR issue_inspector LIKE ?" \
+                    "OR issue_theme LIKE ?" \
+                    "OR issue_facility LIKE ?" \
+                    "OR issue_fac_supervisor LIKE ?" \
+                    "OR issue_spec_loc LIKE ?" \
+                    "OR issue_insp_dept LIKE ?" \
+                    "OR issue_insp_contr LIKE ?" \
+                    "OR issue_insp_subcontr LIKE ?" \
+                    "OR issue_dealine LIKE ?"
+            results = db.cur.execute(query, ('%'+value+'%', '%'+value+'%', '%'+value+'%', '%'+value+'%',
+                                             '%'+value+'%', '%'+value+'%', '%'+value+'%', '%'+value+'%',
+                                             '%'+value+'%', '%'+value+'%', '%'+value+'%', '%'+value+'%',
+                                             '%'+value+'%', '%'+value+'%', )).fetchall()
+            if results == []:
+                QMessageBox.information(self, "Info", "Nothing was found")
+                self.displayIssues()
+            else:
+                for i in reversed(range(self.issuesTable.rowCount())):
+                    self.issuesTable.removeRow(i)
+
+                for row_data in results:
+                    row_number = self.issuesTable.rowCount()
+                    self.issuesTable.insertRow(row_number)
+                    for column_number, data in enumerate(row_data):
+                        self.issuesTable.setItem(row_number, column_number, QTableWidgetItem(str(data)))
+
+    def searchPeople(self):
+        value = self.searchPeopleEntry.text()
+        if value == "":
+            QMessageBox.information(self, "Warning", "Search string cannot be empty")
+            self.displayPeople()
+        else:
+            # Erase search entry
+            self.searchPeopleEntry.setText("")
+            query = "SELECT * FROM people WHERE " \
+                    "person_id LIKE ? " \
+                    "OR person_first_name LIKE ?" \
+                    "OR person_last_name LIKE ?" \
+                    "OR person_title LIKE ?" \
+                    "OR person_phone LIKE ?" \
+                    "OR person_email LIKE ?" \
+                    "OR person_location LIKE ?" \
+                    "OR person_empl_type LIKE ?"
+            results = db.cur.execute(query, ('%' + value + '%', '%' + value + '%', '%' + value + '%',
+                                             '%' + value + '%', '%' + value + '%', '%' + value + '%',
+                                             '%' + value + '%', '%' + value + '%',)).fetchall()
+            if results == []:
+                QMessageBox.information(self, "Info", "Nothing was found")
+                self.displayPeople()
+            else:
+                for i in reversed(range(self.peopleTable.rowCount())):
+                    self.peopleTable.removeRow(i)
+
+                for row_data in results:
+                    row_number = self.peopleTable.rowCount()
+                    self.peopleTable.insertRow(row_number)
+                    for column_number, data in enumerate(row_data):
+                        self.peopleTable.setItem(row_number, column_number, QTableWidgetItem(str(data)))
+
+    def searchFacilities(self):
+        value = self.searchFacilitesEntry.text()
+        if value == "":
+            QMessageBox.information(self, "Warning", "Search string cannot be empty")
+            self.displayFacilities()
+        else:
+            # Erase search entry
+            self.searchFacilitesEntry.setText("")
+            query = "SELECT * FROM facilities WHERE " \
+                    "facility_id LIKE ? " \
+                    "OR facility_name LIKE ?" \
+                    "OR facility_location LIKE ?" \
+                    "OR facility_phone LIKE ?" \
+                    "OR facility_email LIKE ?" \
+                    "OR facility_supervisor LIKE ?"
+            results = db.cur.execute(query, ('%' + value + '%', '%' + value + '%', '%' + value + '%',
+                                             '%' + value + '%', '%' + value + '%', '%' + value + '%')).fetchall()
+            if results == []:
+                QMessageBox.information(self, "Info", "Nothing was found")
+                self.displayFacilities()
+            else:
+                for i in reversed(range(self.facilitiesTable.rowCount())):
+                    self.facilitiesTable.removeRow(i)
+
+                for row_data in results:
+                    row_number = self.facilitiesTable.rowCount()
+                    self.facilitiesTable.insertRow(row_number)
+                    for column_number, data in enumerate(row_data):
+                        self.facilitiesTable.setItem(row_number, column_number, QTableWidgetItem(str(data)))
+
 
 
 class DisplayIssue(QWidget):
