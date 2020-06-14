@@ -126,6 +126,7 @@ class Main(QMainWindow):
         self.addPerson = QPushButton("Add person")
         self.addPerson.clicked.connect(self.funcAddPerson)
         self.viewPerson = QPushButton("View person")
+        self.viewPerson.clicked.connect(self.selectedPerson)
         self.editPerson = QPushButton("Edit person")
         self.deletePerson = QPushButton("Delete person")
 
@@ -168,6 +169,7 @@ class Main(QMainWindow):
         self.addFacility = QPushButton("Add facility")
         self.addFacility.clicked.connect(self.funcAddFacility)
         self.viewFacility = QPushButton("View facility")
+        self.viewFacility.clicked.connect(self.selectedFacility)
         self.editFacility = QPushButton("Edit facility")
         self.deleteFacility = QPushButton("Delete facility")
 
@@ -427,11 +429,125 @@ class Main(QMainWindow):
     def selectedFacility(self):
         global facilityId
         listFacility = []
-        for i in range(0, self.facilitiesTable.colorCount()):
-            listFacility.append(self.peopleTable.item(self.peopleTable.currentRow(), i).text())
-        personId = listFacility[0]
+        ######## I changed the range to 6 because it throws errors when trying to read empty cells###
+        for i in range(0, 6):
+            listFacility.append(self.facilitiesTable.item(self.facilitiesTable.currentRow(), i).text())
+        facilityId = listFacility[0]
         self.displayFacility = DisplayFacility()
         self.displayFacility.show()
+
+
+class DisplayIssue(QWidget):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle("View issue")
+        self.setWindowIcon(QIcon("assets/icons/logo-dark.png"))
+        self.setGeometry(450, 150, 750, 650)
+        self.UI()
+        self.show()
+
+    def UI(self):
+        self.issueDetails()
+        self.widgets()
+        self.layouts()
+
+    def issueDetails(self):
+        global issueId
+
+        query = "SELECT * FROM issues WHERE issue_id=?"
+
+        cur = db.cur
+        issue = cur.execute(query, (issueId,)).fetchone()
+
+        self.id = issue[0]
+        self.date = issue[1]
+        self.priority = issue[2]
+        self.observer = issue[3]
+        self.revTeam = issue[4]
+        self.inspectorName = issue[5]
+        self.theme = issue[6]
+        self.facility = issue[7]
+        self.facilitySupervisor = issue[8]
+        self.specLocation = issue[9]
+        self.inspectedDept = issue[10]
+        self.inspectedContr = issue[11]
+        self.inspectedSubcontr = issue[12]
+        self.deadline = issue[13]
+
+    def widgets(self):
+        # Top layout widgets
+        self.issueImg = QLabel()
+        self.img = QPixmap('assets/icons/logo-dark.png')
+        self.issueImg.setPixmap(self.img)
+        self.issueImg.setAlignment(Qt.AlignCenter)
+        self.titleText = QLabel("Display issue")
+        self.titleText.setAlignment(Qt.AlignCenter)
+        # Bottom layout widgets
+        self.idEntry = QLineEdit()
+        self.idEntry.setText(self.id)
+        self.dateEntry = QLineEdit()
+        self.dateEntry.setText(self.date)
+        self.priorityEntry = QLineEdit()
+        self.priorityEntry.setText(self.priority)
+        self.observerEntry = QLineEdit()
+        self.observerEntry.setText(self.observer)
+        self.revTeamEntry = QLineEdit()
+        self.revTeamEntry.setText(self.revTeam)
+        self.inspectorNameEntry = QLineEdit()
+        self.inspectorNameEntry.setText(self.inspectorName)
+        self.themeEntry = QLineEdit()
+        self.themeEntry.setText(self.theme)
+        self.facilityEntry = QLineEdit()
+        self.facilityEntry.setText(self.facility)
+        self.facilitySupervisorEntry = QLineEdit()
+        self.facilitySupervisorEntry.setText(self.facilitySupervisor)
+        self.specLocationEntry = QLineEdit()
+        self.specLocationEntry.setText(self.specLocation)
+        self.inspectedDeptEntry = QLineEdit()
+        self.inspectedDeptEntry.setText(self.inspectedDept)
+        self.inspectedContrEntry = QLineEdit()
+        self.inspectedContrEntry.setText(self.inspectedContr)
+        self.inspectedSubcontrEntry = QLineEdit()
+        self.inspectedSubcontrEntry.setText(self.inspectedSubcontr)
+        self.deadlineEntry = QLineEdit()
+        self.deadlineEntry.setText(self.deadline)
+        self.updateBtn = QPushButton("Update")
+        self.deleteBtn = QPushButton("Delete")
+
+    def layouts(self):
+        self.mainLayout = QVBoxLayout()
+        self.topLayout = QVBoxLayout()
+        self.bottomLayout = QFormLayout()
+        self.topFrame = QFrame()
+        self.bottomFrame = QFrame()
+
+        # Add widgets
+        self.topLayout.addWidget(self.titleText)
+        self.topLayout.addWidget(self.personImg)
+        self.topFrame.setLayout(self.topLayout)
+
+        self.bottomLayout.addRow("ID: ", self.idEntry)
+        self.bottomLayout.addRow("Date: ", self.dateEntry)
+        self.bottomLayout.addRow("Priority: ", self.priorityEntry)
+        self.bottomLayout.addRow("Observer: ", self.observerEntry)
+        self.bottomLayout.addRow("Revision Team: ", self.revTeamEntry)
+        self.bottomLayout.addRow("Inspector name: ", self.inspectorNameEntry)
+        self.bottomLayout.addRow("HSE theme: ", self.themeEntry)
+        self.bottomLayout.addRow("Facility: ", self.facilityEntry)
+        self.bottomLayout.addRow("Facility supervisor: ", self.facilitySupervisorEntry)
+        self.bottomLayout.addRow("Specific location: ", self.specLocationEntry)
+        self.bottomLayout.addRow("Inspected department: ", self.inspectedDeptEntry)
+        self.bottomLayout.addRow("Inspected contractor: ", self.inspectedContrEntry)
+        self.bottomLayout.addRow("Inspected subcontractor: ", self.inspectedSubcontr)
+        self.bottomLayout.addRow("Deadline: ", self.deadlineEntry)
+        self.bottomLayout.addRow("", self.updateBtn)
+        self.bottomLayout.addRow("", self.deleteBtn)
+        self.bottomFrame.setLayout(self.bottomLayout)
+
+        self.mainLayout.addWidget(self.topFrame)
+        self.mainLayout.addWidget(self.bottomFrame)
+
+        self.setLayout(self.mainLayout)
 
 
 class DisplayPerson(QWidget):
@@ -444,12 +560,86 @@ class DisplayPerson(QWidget):
         self.show()
 
     def UI(self):
-        pass
+        self.personDetails()
+        self.widgets()
+        self.layouts()
+
+    def personDetails(self):
+        global personId
+
+        query = "SELECT * FROM people WHERE person_id=?"
+
+        cur = db.cur
+        person = cur.execute(query, (personId,)).fetchone()
+
+        self.id = person[0]
+        self.firstName = person[1]
+        self.lastName = person[2]
+        self.title = person[3]
+        self.phone = person[4]
+        self.email = person[5]
+        self.location = person[6]
+        self.emplType = person[7]
+
+    def widgets(self):
+        # Top layout widgets
+        self.personImg = QLabel()
+        self.img = QPixmap('assets/icons/logo-dark.png')
+        self.personImg.setPixmap(self.img)
+        self.personImg.setAlignment(Qt.AlignCenter)
+        self.titleText = QLabel("Display person")
+        self.titleText.setAlignment(Qt.AlignCenter)
+        # Bottom layout widgets
+        self.idEntry = QLineEdit()
+        self.idEntry.setText(self.id)
+        self.firstNameEntry = QLineEdit()
+        self.firstNameEntry.setText(self.firstName)
+        self.lastNameEntry = QLineEdit()
+        self.lastNameEntry.setText(self.lastName)
+        self.titleEntry = QLineEdit()
+        self.titleEntry.setText(self.title)
+        self.phoneEntry = QLineEdit()
+        self.phoneEntry.setText(self.phone)
+        self.emailEntry = QLineEdit()
+        self.emailEntry.setText(self.email)
+        self.locationEntry = QLineEdit()
+        self.locationEntry.setText(self.location)
+        self.emplTypeEntry = QLineEdit()
+        self.emplTypeEntry.setText(self.emplType)
+        self.updateBtn = QPushButton("Update")
+        self.deleteBtn = QPushButton("Delete")
+
+    def layouts(self):
+        self.mainLayout = QVBoxLayout()
+        self.topLayout = QVBoxLayout()
+        self.bottomLayout = QFormLayout()
+        self.topFrame = QFrame()
+        self.bottomFrame = QFrame()
+
+        # Add widgets
+        self.topLayout.addWidget(self.titleText)
+        self.topLayout.addWidget(self.personImg)
+        self.topFrame.setLayout(self.topLayout)
+
+        self.bottomLayout.addRow("ID: ", self.idEntry)
+        self.bottomLayout.addRow("First name: ", self.firstNameEntry)
+        self.bottomLayout.addRow("Last name: ", self.lastNameEntry)
+        self.bottomLayout.addRow("Title: ", self.titleEntry)
+        self.bottomLayout.addRow("Phone: ", self.phoneEntry)
+        self.bottomLayout.addRow("Email: ", self.emailEntry)
+        self.bottomLayout.addRow("Location: ", self.locationEntry)
+        self.bottomLayout.addRow("Employment type: ", self.emplTypeEntry)
+        self.bottomLayout.addRow("", self.updateBtn)
+        self.bottomLayout.addRow("", self.deleteBtn)
+        self.bottomFrame.setLayout(self.bottomLayout)
+
+        self.mainLayout.addWidget(self.topFrame)
+        self.mainLayout.addWidget(self.bottomFrame)
+
+        self.setLayout(self.mainLayout)
 
 
-
-
-class displayFacility(QWidget):
+class DisplayFacility(QWidget):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("View facility")
@@ -459,7 +649,75 @@ class displayFacility(QWidget):
         self.show()
 
     def UI(self):
-        pass
+        self.facilityDetails()
+        self.widgets()
+        self.layouts()
+
+    def facilityDetails(self):
+        global facilityId
+
+        query = "SELECT * FROM facilities WHERE facility_id=?"
+
+        cur = db.cur
+        facility = cur.execute(query, (facilityId,)).fetchone()
+
+        self.id = facility[0]
+        self.name = facility[1]
+        self.location = facility[2]
+        self.phone = facility[3]
+        self.email = facility[4]
+        self.supervisor = facility[5]
+
+    def widgets(self):
+        # Top layout widgets
+        self.facilityImg = QLabel()
+        self.img = QPixmap('assets/icons/logo-dark.png')
+        self.facilityImg.setPixmap(self.img)
+        self.facilityImg.setAlignment(Qt.AlignCenter)
+        self.titleText = QLabel("Display facility")
+        self.titleText.setAlignment(Qt.AlignCenter)
+        # Bottom layout widgets
+        self.idEntry = QLineEdit()
+        self.idEntry.setText(self.id)
+        self.nameEntry = QLineEdit()
+        self.nameEntry.setText(self.name)
+        self.locationEntry = QLineEdit()
+        self.locationEntry.setText(self.location)
+        self.phoneEntry = QLineEdit()
+        self.phoneEntry.setText(self.phone)
+        self.emailEntry = QLineEdit()
+        self.emailEntry.setText(self.email)
+        self.supervisorEntry = QLineEdit()
+        self.supervisorEntry.setText(self.supervisor)
+        self.updateBtn = QPushButton("Update")
+        self.deleteBtn = QPushButton("Delete")
+
+    def layouts(self):
+        self.mainLayout = QVBoxLayout()
+        self.topLayout = QVBoxLayout()
+        self.bottomLayout = QFormLayout()
+        self.topFrame = QFrame()
+        self.bottomFrame = QFrame()
+
+        # Add widgets
+        self.topLayout.addWidget(self.titleText)
+        self.topLayout.addWidget(self.facilityImg)
+        self.topFrame.setLayout(self.topLayout)
+
+        self.bottomLayout.addRow("ID: ", self.idEntry)
+        self.bottomLayout.addRow("First name: ", self.nameEntry)
+        self.bottomLayout.addRow("Last name: ", self.locationEntry)
+        self.bottomLayout.addRow("Title: ", self.phoneEntry)
+        self.bottomLayout.addRow("Phone: ", self.emailEntry)
+        self.bottomLayout.addRow("Email: ", self.supervisorEntry)
+        self.bottomLayout.addRow("", self.updateBtn)
+        self.bottomLayout.addRow("", self.deleteBtn)
+        self.bottomFrame.setLayout(self.bottomLayout)
+
+        self.mainLayout.addWidget(self.topFrame)
+        self.mainLayout.addWidget(self.bottomFrame)
+
+        self.setLayout(self.mainLayout)
 
 
 def main():
