@@ -5,6 +5,8 @@ from PySide2.QtCore import *
 import sqlite3
 from PIL import Image
 
+import datetime
+
 import backend
 
 db = backend.Database("simplereport-data.db")
@@ -149,10 +151,12 @@ class AddIssue(QWidget):
                         "issue_spec_loc, issue_insp_dept, issue_insp_contr, issue_insp_subcontr, issue_deadline) " \
                         "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
 
+                print("Before exec")
                 db.cur.execute(query, (date, priority, observer, revisionTeam, inspectionName, observationTheme,
                                        facility, facilitySupervisor, specificLocation, inspectedDept, inspectedContr,
                                        inspectedSubcontr, deadline))
                 db.conn.commit()
+                print("After exec")
                 QMessageBox.information(self, "Info", "Issue has been added")
             except:
                 QMessageBox.information(self, "Info", "Issue has not been added")

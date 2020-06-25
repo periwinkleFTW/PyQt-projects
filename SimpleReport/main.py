@@ -55,11 +55,12 @@ class Main(QMainWindow):
         self.lateIssuesRadioBtn = QRadioButton("Late issues")
         self.closedIssuesRadioBtn = QRadioButton("Closed issues")
         self.listIssuesBtn = QPushButton("List issues")
+        self.listIssuesBtn.clicked.connect(self.listIssues)
 
         # Bottom layout widget
         # Table showing issues
         self.issuesTable = QTableWidget()
-        self.issuesTable.setColumnCount(14)
+        self.issuesTable.setColumnCount(16)
         # self.issuesTable.setColumnHidden(0, True)
         self.issuesTable.setHorizontalHeaderItem(0, QTableWidgetItem("ID"))
         self.issuesTable.setHorizontalHeaderItem(1, QTableWidgetItem("Date"))
@@ -75,6 +76,8 @@ class Main(QMainWindow):
         self.issuesTable.setHorizontalHeaderItem(11, QTableWidgetItem("Insp. Contr."))
         self.issuesTable.setHorizontalHeaderItem(12, QTableWidgetItem("Subcontr"))
         self.issuesTable.setHorizontalHeaderItem(13, QTableWidgetItem("Deadline"))
+        self.issuesTable.setHorizontalHeaderItem(14, QTableWidgetItem("Status"))
+        self.issuesTable.setHorizontalHeaderItem(15, QTableWidgetItem("Created on"))
 
         # Double clicking a row opens a window with issue details
         self.issuesTable.doubleClicked.connect(self.selectedIssue)
@@ -559,7 +562,7 @@ class Main(QMainWindow):
             self.displayIssues()
         elif self.ongoingIssuesRadioBtn.isChecked():
             query = "SELECT * FROM issues WHERE status='Open' " \
-                    "AND issue_deadline > datetime('now', 'localtime)'"
+                    "AND issue_deadline > DATETIME('now')"
             issues = db.cur.execute(query).fetchall()
 
             for i in reversed(range(self.issuesTable.rowCount())):
