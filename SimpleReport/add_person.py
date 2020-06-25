@@ -9,9 +9,6 @@ import backend
 
 db = backend.Database("simplereport-data.db")
 
-# conn = sqlite3.connect("simplereport-data.db")
-# cur = conn.cursor()
-
 defaultImg = "assets/icons/logo-dark.png"
 
 class AddPerson(QWidget):
@@ -117,6 +114,7 @@ class AddPerson(QWidget):
                 self.emailEntry.setText("")
                 self.locationEntry.setText("")
                 self.employmentTypeEntry.setCurrentText("")
+
             except:
                 QMessageBox.information(self, "Info", "Member has not been added")
         else:

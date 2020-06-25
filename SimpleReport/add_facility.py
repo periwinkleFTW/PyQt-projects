@@ -9,9 +9,6 @@ import backend
 
 db = backend.Database("simplereport-data.db")
 
-# conn = sqlite3.connect("simplereport-data.db")
-# cur = conn.cursor()
-
 defaultImg = "assets/icons/logo-dark.png"
 
 class AddFacility(QWidget):
@@ -101,16 +98,8 @@ class AddFacility(QWidget):
                 query = "INSERT INTO facilities (facility_name, facility_location, facility_phone, facility_email," \
                         "facility_supervisor) VALUES (?, ?, ?, ?, ?)"
 
-                print("Before exec")
-                print(name)
-                print(location)
-                print(phone)
-                print(email)
-                print(supervisor)
-
                 db.cur.execute(query, (name, location, phone, email, supervisor))
                 db.conn.commit()
-                print("After exec")
                 QMessageBox.information(self, "Info", "Facility has been added")
             except:
                 QMessageBox.information(self, "Info", "Facility has not been added")

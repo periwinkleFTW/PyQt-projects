@@ -9,9 +9,6 @@ import backend
 
 db = backend.Database("simplereport-data.db")
 
-# conn = sqlite3.connect("simplereport-data.db")
-# cur = conn.cursor()
-
 defaultImg = "assets/icons/logo-dark.png"
 
 
@@ -145,20 +142,6 @@ class AddIssue(QWidget):
         inspectedSubcontr = self.inspectedSubcontractorEntry.currentText()
         deadline = self.deadlineEntry.text()
 
-        print(type(date))
-        print(priority)
-        print(observer)
-        print(revisionTeam)
-        print(inspectionName)
-        print(observationTheme)
-        print(facility)
-        print(facilitySupervisor)
-        print(type(specificLocation))
-        print(inspectedDept)
-        print(inspectedContr)
-        print(inspectedSubcontr)
-        print(type(deadline))
-
         if (date and deadline != ""):
             try:
                 query = "INSERT INTO issues (issue_date, issue_priority, issue_observer, issue_team," \
@@ -166,12 +149,10 @@ class AddIssue(QWidget):
                         "issue_spec_loc, issue_insp_dept, issue_insp_contr, issue_insp_subcontr, issue_deadline) " \
                         "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
 
-                print("Before exec")
                 db.cur.execute(query, (date, priority, observer, revisionTeam, inspectionName, observationTheme,
                                        facility, facilitySupervisor, specificLocation, inspectedDept, inspectedContr,
                                        inspectedSubcontr, deadline))
                 db.conn.commit()
-                print("After exec")
                 QMessageBox.information(self, "Info", "Issue has been added")
             except:
                 QMessageBox.information(self, "Info", "Issue has not been added")

@@ -80,6 +80,8 @@ class Main(QMainWindow):
         self.issuesTable.doubleClicked.connect(self.selectedIssue)
 
         # Buttons for actions on selected issues
+        self.refreshIssuesBtn = QPushButton("Refresh")
+        self.refreshIssuesBtn.clicked.connect(self.displayIssues)
         self.addIssue = QPushButton("Add issue")
         self.addIssue.clicked.connect(self.funcAddIssue)
         self.viewIssue = QPushButton("View issue")
@@ -125,6 +127,8 @@ class Main(QMainWindow):
         self.peopleTable.doubleClicked.connect(self.selectedPerson)
 
         # Buttons for actions on selected people
+        self.refreshPeopleBtn = QPushButton("Refresh")
+        self.refreshPeopleBtn.clicked.connect(self.displayPeople)
         self.addPerson = QPushButton("Add person")
         self.addPerson.clicked.connect(self.funcAddPerson)
         self.viewPerson = QPushButton("View person")
@@ -169,6 +173,8 @@ class Main(QMainWindow):
         self.facilitiesTable.doubleClicked.connect(self.selectedFacility)
 
         # Buttons for actions on selected facilities
+        self.refreshFacilitiesBtn = QPushButton("Refresh")
+        self.refreshFacilitiesBtn.clicked.connect(self.displayFacilities)
         self.addFacility = QPushButton("Add facility")
         self.addFacility.clicked.connect(self.funcAddFacility)
         self.viewFacility = QPushButton("View facility")
@@ -224,12 +230,13 @@ class Main(QMainWindow):
         self.issuesBottomLeftGroupBox.setLayout(self.issuesBottomLeftLayout)
 
         # Bottom right layout with buttons
+        self.issuesBottomRightLayout.addWidget(self.refreshIssuesBtn, 5)
         self.issuesBottomRightLayout.addWidget(self.addIssue, 5)
         self.issuesBottomRightLayout.addWidget(self.viewIssue, 5)
         self.issuesBottomRightLayout.addWidget(self.editIssue, 5)
         self.issuesBottomRightLayout.addWidget(self.closeIssue, 5)
         self.issuesBottomRightLayout.addWidget(self.deleteIssue, 5)
-        self.issuesBottomRightLayout.addWidget(self.issuesBottomRightGroupBoxFiller, 75)
+        self.issuesBottomRightLayout.addWidget(self.issuesBottomRightGroupBoxFiller, 70)
         self.issuesBottomRightGroupBox.setLayout(self.issuesBottomRightLayout)
 
         self.issuesMainBottomLayout.addWidget(self.issuesBottomLeftGroupBox, 90)
@@ -280,11 +287,12 @@ class Main(QMainWindow):
         self.peopleBottomLeftGroupBox.setLayout(self.peopleBottomLeftLayout)
 
         # Bottom right layout with buttons
+        self.peopleBottomRightLayout.addWidget(self.refreshPeopleBtn, 5)
         self.peopleBottomRightLayout.addWidget(self.addPerson, 5)
         self.peopleBottomRightLayout.addWidget(self.viewPerson, 5)
         self.peopleBottomRightLayout.addWidget(self.editPerson, 5)
         self.peopleBottomRightLayout.addWidget(self.deletePerson, 5)
-        self.peopleBottomRightLayout.addWidget(self.peopleBottomRightGroupBoxFiller, 75)
+        self.peopleBottomRightLayout.addWidget(self.peopleBottomRightGroupBoxFiller, 70)
         self.peopleBottomRightGroupBox.setLayout(self.peopleBottomRightLayout)
 
         self.peopleMainBottomLayout.addWidget(self.peopleBottomLeftGroupBox, 90)
@@ -334,11 +342,12 @@ class Main(QMainWindow):
         self.facilitiesBottomLeftGroupBox.setLayout(self.facilitiesBottomLeftLayout)
 
         # Bottom right layout with buttons
+        self.facilitiesBottomRightLayout.addWidget(self.refreshFacilitiesBtn, 5)
         self.facilitiesBottomRightLayout.addWidget(self.addFacility, 5)
         self.facilitiesBottomRightLayout.addWidget(self.viewFacility, 5)
         self.facilitiesBottomRightLayout.addWidget(self.editFacility, 5)
         self.facilitiesBottomRightLayout.addWidget(self.deleteFacility, 5)
-        self.facilitiesBottomRightLayout.addWidget(self.facilitiesBottomRightGroupBoxFiller, 75)
+        self.facilitiesBottomRightLayout.addWidget(self.facilitiesBottomRightGroupBoxFiller, 70)
         self.facilitiesBottomRightGroupBox.setLayout(self.facilitiesBottomRightLayout)
 
         self.facilitiesMainBottomLayout.addWidget(self.facilitiesBottomLeftGroupBox, 90)
