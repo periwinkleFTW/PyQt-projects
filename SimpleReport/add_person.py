@@ -29,7 +29,7 @@ class AddPerson(QWidget):
     def widgets(self):
         # Top layout widgets
         self.addPersonImg = QLabel()
-        self.img = QPixmap('assets/icons/add-person.png')
+        self.img = QPixmap('assets/icons/edit-item.png')
         self.addPersonImg.setPixmap(self.img)
         self.addPersonImg.setAlignment(Qt.AlignCenter)
         self.titleText = QLabel("Add person")
@@ -43,7 +43,10 @@ class AddPerson(QWidget):
         self.phoneEntry = QLineEdit()
         self.emailEntry = QLineEdit()
         self.locationEntry = QLineEdit()
+
+        emplTypes = ["Employee", "Contractor", "Subcontractor"]
         self.employmentTypeEntry = QComboBox()
+        self.employmentTypeEntry.addItems(emplTypes)
         self.employmentTypeEntry.setEditable(True)
 
         self.attachPhotoBtn = QPushButton("Attach photo")
@@ -113,7 +116,7 @@ class AddPerson(QWidget):
                 self.phoneEntry.setText("")
                 self.emailEntry.setText("")
                 self.locationEntry.setText("")
-                self.employmentTypeEntry.setCurrentText("")
+                self.employmentTypeEntry.setCurrentIndex(0)
 
             except:
                 QMessageBox.information(self, "Info", "Member has not been added")

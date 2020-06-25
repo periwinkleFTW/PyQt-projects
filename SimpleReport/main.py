@@ -104,6 +104,7 @@ class Main(QMainWindow):
         self.contractorsPeopleRadioBtn = QRadioButton("Contractors")
         self.subcontractorsPeopleRadioBtn = QRadioButton("Subcontractors")
         self.listPeopleBtn = QPushButton("List people")
+        self.listPeopleBtn.clicked.connect(self.listPeople)
 
         # Bottom layout widget, a table showing people
         self.peopleTable = QTableWidget()
@@ -551,6 +552,88 @@ class Main(QMainWindow):
                     self.facilitiesTable.insertRow(row_number)
                     for column_number, data in enumerate(row_data):
                         self.facilitiesTable.setItem(row_number, column_number, QTableWidgetItem(str(data)))
+
+    # List functions
+    def listIssues(self):
+        if self.allIssuesRadioBtn.isChecked():
+            self.displayIssues()
+        elif self.ongoingIssuesRadioBtn.isChecked():
+            query = "SELECT * FROM issues WHERE status='Open' " \
+                    "AND issue_deadline > datetime('now', 'localtime)'"
+            issues = db.cur.execute(query).fetchall()
+
+            for i in reversed(range(self.issuesTable.rowCount())):
+                self.issuesTable.removeRow(i)
+
+            for row_data in issues:
+                row_number = self.issuesTable.rowCount()
+                self.issuesTable.insertRow(row_number)
+                for column_number, data in enumerate(row_data):
+                    self.issuesTable.setItem(row_number, column_number, QTableWidgetItem(str(data)))
+        elif self.lateIssuesRadioBtn.isChecked():
+            query = "SELECT * FROM issues WHERE status='Open' AND closed_on < issue_deadline"
+            issues = db.cur.execute(query).fetchall()
+
+            for i in reversed(range(self.issuesTable.rowCount())):
+                self.issuesTable.removeRow(i)
+
+            for row_data in issues:
+                row_number = self.issuesTable.rowCount()
+                self.issuesTable.insertRow(row_number)
+                for column_number, data in enumerate(row_data):
+                    self.issuesTable.setItem(row_number, column_number, QTableWidgetItem(str(data)))
+        elif self.closedIssuesRadioBtn.isChecked():
+            query = "SELECT * FROM issues WHERE status='Closed'"
+            issues = db.cur.execute(query).fetchall()
+
+            for i in reversed(range(self.issuesTable.rowCount())):
+                self.issuesTable.removeRow(i)
+
+            for row_data in issues:
+                row_number = self.issuesTable.rowCount()
+                self.issuesTable.insertRow(row_number)
+                for column_number, data in enumerate(row_data):
+                    self.issuesTable.setItem(row_number, column_number, QTableWidgetItem(str(data)))
+
+    def listPeople(self):
+        if self.allPeopleRadioBtn.isChecked():
+            self.displayPeople()
+        elif self.employeesPeopleRadioBtn.isChecked():
+            query = "SELECT * FROM people WHERE person_empl_type = 'Employee'"
+            people = db.cur.execute(query).fetchall()
+
+            for i in reversed(range(self.peopleTable.rowCount())):
+                self.peopleTable.removeRow(i)
+
+            for row_data in people:
+                row_number = self.peopleTable.rowCount()
+                self.peopleTable.insertRow(row_number)
+                for column_number, data in enumerate(row_data):
+                    self.peopleTable.setItem(row_number, column_number, QTableWidgetItem(str(data)))
+        elif self.contractorsPeopleRadioBtn.isChecked():
+            query = "SELECT * FROM people WHERE person_empl_type = 'Contractor'"
+            people = db.cur.execute(query).fetchall()
+
+            for i in reversed(range(self.peopleTable.rowCount())):
+                self.peopleTable.removeRow(i)
+
+            for row_data in people:
+                row_number = self.peopleTable.rowCount()
+                self.peopleTable.insertRow(row_number)
+                for column_number, data in enumerate(row_data):
+                    self.peopleTable.setItem(row_number, column_number, QTableWidgetItem(str(data)))
+        elif self.subcontractorsPeopleRadioBtn.isChecked():
+            query = "SELECT * FROM people WHERE person_empl_type = 'Subcontractor'"
+            people = db.cur.execute(query).fetchall()
+
+            for i in reversed(range(self.peopleTable.rowCount())):
+                self.peopleTable.removeRow(i)
+
+            for row_data in people:
+                row_number = self.peopleTable.rowCount()
+                self.peopleTable.insertRow(row_number)
+                for column_number, data in enumerate(row_data):
+                    self.peopleTable.setItem(row_number, column_number, QTableWidgetItem(str(data)))
 
 
 

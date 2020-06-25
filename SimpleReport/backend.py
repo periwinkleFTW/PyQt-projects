@@ -41,7 +41,9 @@ class Database:
                                     "issue_insp_dept TEXT," \
                                     "issue_insp_contr TEXT," \
                                     "issue_insp_subcontr TEXT," \
-                                    "issue_deadline TEXT" \
+                                    "issue_deadline TEXT, " \
+                                    "status TEXT DEFAULT 'Open', " \
+                                    "closed_on TEXT" \
                                     ")"
 
         if self.conn is not None:
