@@ -5,8 +5,12 @@ from PySide2.QtCore import *
 import sqlite3
 from PIL import Image
 
-conn = sqlite3.connect("simplereport-data.db")
-cur = conn.cursor()
+import backend
+
+db = backend.Database("simplereport-data.db")
+
+# conn = sqlite3.connect("simplereport-data.db")
+# cur = conn.cursor()
 
 defaultImg = "assets/icons/logo-dark.png"
 
@@ -46,6 +50,7 @@ class AddFacility(QWidget):
         self.attachPhotoBtn = QPushButton("Attach photo")
 
         self.addFacilityBtn = QPushButton("Add facility")
+        self.addFacilityBtn.clicked.connect(self.addFacility)
 
 
     def layouts(self):
@@ -82,7 +87,35 @@ class AddFacility(QWidget):
         self.setLayout(self.mainLayout)
 
 
+    def addFacility(self):
+        name = self.facilityNameEntry.text()
+        location = self.facilityLocationEntry.text()
+        phone = self.facilityPhoneEntry.text()
+        email = self.facilityEmailEntry.text()
+        supervisor = self.facilitySupervisorEntry.text()
 
+
+
+        if (name and location != ""):
+            try:
+                query = "INSERT INTO facilities (facility_name, facility_location, facility_phone, facility_email," \
+                        "facility_supervisor) VALUES (?, ?, ?, ?, ?)"
+
+                print("Before exec")
+                print(name)
+                print(location)
+                print(phone)
+                print(email)
+                print(supervisor)
+
+                db.cur.execute(query, (name, location, phone, email, supervisor))
+                db.conn.commit()
+                print("After exec")
+                QMessageBox.information(self, "Info", "Facility has been added")
+            except:
+                QMessageBox.information(self, "Info", "Facility has not been added")
+        else:
+            QMessageBox.information(self, "Info", "Fields cannot be empty")
 
 
 

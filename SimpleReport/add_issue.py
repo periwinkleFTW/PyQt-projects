@@ -5,10 +5,15 @@ from PySide2.QtCore import *
 import sqlite3
 from PIL import Image
 
+import backend
+
+db = backend.Database("simplereport-data.db")
+
 # conn = sqlite3.connect("simplereport-data.db")
 # cur = conn.cursor()
 
 defaultImg = "assets/icons/logo-dark.png"
+
 
 class AddIssue(QWidget):
     def __init__(self):
@@ -16,7 +21,7 @@ class AddIssue(QWidget):
         self.setWindowTitle("Add issue")
         self.setWindowIcon(QIcon("assets/icons/icon.ico"))
         self.setGeometry(450, 150, 750, 650)
-        #self.setFixedSize(self.size())
+        # self.setFixedSize(self.size())
 
         self.UI()
         self.show()
@@ -40,6 +45,8 @@ class AddIssue(QWidget):
         self.issueInfoTitleText = QLabel("Issue info")
         self.issueInfoTitleText.setAlignment(Qt.AlignCenter)
         self.dateEntry = QDateEdit()
+        self.priorityEntry = QComboBox()
+        self.priorityEntry.setEditable(True)
         self.observerEntry = QComboBox()
         self.observerEntry.setEditable(True)
         self.revisionTeamEntry = QComboBox()
@@ -59,17 +66,9 @@ class AddIssue(QWidget):
         self.inspectedContractorEntry.setEditable(True)
         self.inspectedSubcontractorEntry = QComboBox()
         self.inspectedSubcontractorEntry.setEditable(True)
+        self.deadlineEntry = QDateEdit()
 
         # Bottom layout widgets
-        self.observationTitleText = QLabel("Observation details")
-        self.observationTitleText.setAlignment(Qt.AlignCenter)
-        self.observationDetailsEntry = QTextEdit()
-        self.targetDateEntry = QDateEdit()
-        self.priorityEntry = QComboBox()
-        self.priorityEntry.setEditable(True)
-        self.personResponsibleEntry = QComboBox()
-        self.personResponsibleEntry.setEditable(True)
-        self.actionDescriptionEntry =QTextEdit()
         self.attachFilesBtn = QPushButton("Attach files")
         self.addActionBtn = QPushButton("Add action")
 
@@ -81,6 +80,7 @@ class AddIssue(QWidget):
         self.addRootCauseBtn = QPushButton("Add root cause")
 
         self.submitObservationBtn = QPushButton("Submit observation")
+        self.submitObservationBtn.clicked.connect(self.addIssue)
 
     def layouts(self):
         self.mainLayout = QVBoxLayout()
@@ -91,7 +91,6 @@ class AddIssue(QWidget):
         self.topFrame = QFrame()
         self.bottomFrame = QFrame()
 
-
         # Add widgets to top layout
         self.topLayout.addWidget(self.addIssueImg)
         self.topLayout.addWidget(self.titleText)
@@ -101,6 +100,7 @@ class AddIssue(QWidget):
         # Add widgets to middle layout
         self.bottomLayout.addRow(self.issueInfoTitleText)
         self.bottomLayout.addRow(QLabel("Inspection Date: "), self.dateEntry)
+        self.bottomLayout.addRow(QLabel("Priority: "), self.priorityEntry)
         self.bottomLayout.addRow(QLabel("Observer: "), self.observerEntry)
         self.bottomLayout.addRow(QLabel("Revision Team: "), self.revisionTeamEntry)
         self.bottomLayout.addRow(QLabel("Inspection Name: "), self.inspectionNameEntry)
@@ -111,20 +111,11 @@ class AddIssue(QWidget):
         self.bottomLayout.addRow(QLabel("Inspected department: "), self.inspectedDepartmentEntry)
         self.bottomLayout.addRow(QLabel("Inspected contractor: "), self.inspectedContractorEntry)
         self.bottomLayout.addRow(QLabel("Inspected subcontractor: "), self.inspectedSubcontractorEntry)
+        self.bottomLayout.addRow(QLabel("Deadline: "), self.deadlineEntry)
 
-        self.bottomLayout.addRow(self.observationTitleText)
-        self.bottomLayout.addRow(QLabel("Observation details: "), self.observationDetailsEntry)
-        self.bottomLayout.addRow(QLabel("Target date: "), self.targetDateEntry)
-        self.bottomLayout.addRow(QLabel("Priority: "), self.priorityEntry)
-        self.bottomLayout.addRow(QLabel("Person responsible: "), self.personResponsibleEntry)
-        self.bottomLayout.addRow(QLabel("Action description: "), self.actionDescriptionEntry)
         self.bottomLayout.addRow(QLabel(""), self.attachFilesBtn)
         self.bottomLayout.addRow(QLabel(""), self.addActionBtn)
 
-
-        self.bottomLayout.addRow(QLabel("Root cause: "), self.rootCauseEntry)
-        self.bottomLayout.addRow(QLabel("Root cause details: "), self.rootCauseDetailsEntry)
-        self.bottomLayout.addRow(QLabel("Root cause action party: "), self.rootCauseActionPartyEntry)
         self.bottomLayout.addRow(QLabel(""), self.addRootCauseBtn)
         self.bottomLayout.addRow(QLabel(""), self.submitObservationBtn)
 
@@ -139,12 +130,50 @@ class AddIssue(QWidget):
 
         self.setLayout(self.mainLayout)
 
+    def addIssue(self):
+        date = self.dateEntry.text()
+        priority = self.priorityEntry.currentText()
+        observer = self.observerEntry.currentText()
+        revisionTeam = self.revisionTeamEntry.currentText()
+        inspectionName = self.inspectionNameEntry.currentText()
+        observationTheme = self.observationThemeEntry.currentText()
+        facility = self.facilityEntry.currentText()
+        facilitySupervisor = self.facilitySupervisorEntry.currentText()
+        specificLocation = self.specificLocationEntry.toPlainText()
+        inspectedDept = self.inspectedDepartmentEntry.currentText()
+        inspectedContr = self.inspectedContractorEntry.currentText()
+        inspectedSubcontr = self.inspectedSubcontractorEntry.currentText()
+        deadline = self.deadlineEntry.text()
 
+        print(type(date))
+        print(priority)
+        print(observer)
+        print(revisionTeam)
+        print(inspectionName)
+        print(observationTheme)
+        print(facility)
+        print(facilitySupervisor)
+        print(type(specificLocation))
+        print(inspectedDept)
+        print(inspectedContr)
+        print(inspectedSubcontr)
+        print(type(deadline))
 
+        if (date and deadline != ""):
+            try:
+                query = "INSERT INTO issues (issue_date, issue_priority, issue_observer, issue_team," \
+                        "issue_inspection, issue_theme, issue_facility, issue_fac_supervisor," \
+                        "issue_spec_loc, issue_insp_dept, issue_insp_contr, issue_insp_subcontr, issue_deadline) " \
+                        "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
 
-
-
-
-
-
-
+                print("Before exec")
+                db.cur.execute(query, (date, priority, observer, revisionTeam, inspectionName, observationTheme,
+                                       facility, facilitySupervisor, specificLocation, inspectedDept, inspectedContr,
+                                       inspectedSubcontr, deadline))
+                db.conn.commit()
+                print("After exec")
+                QMessageBox.information(self, "Info", "Issue has been added")
+            except:
+                QMessageBox.information(self, "Info", "Issue has not been added")
+        else:
+            QMessageBox.information(self, "Info", "Fields cannot be empty")

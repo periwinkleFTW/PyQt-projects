@@ -66,7 +66,7 @@ class Main(QMainWindow):
         self.issuesTable.setHorizontalHeaderItem(2, QTableWidgetItem("Priority"))
         self.issuesTable.setHorizontalHeaderItem(3, QTableWidgetItem("Observer"))
         self.issuesTable.setHorizontalHeaderItem(4, QTableWidgetItem("Rev. Team"))
-        self.issuesTable.setHorizontalHeaderItem(5, QTableWidgetItem("Insp. Name"))
+        self.issuesTable.setHorizontalHeaderItem(5, QTableWidgetItem("Inspection name"))
         self.issuesTable.setHorizontalHeaderItem(6, QTableWidgetItem("Theme"))
         self.issuesTable.setHorizontalHeaderItem(7, QTableWidgetItem("Facility"))
         self.issuesTable.setHorizontalHeaderItem(8, QTableWidgetItem("Facility Superv."))

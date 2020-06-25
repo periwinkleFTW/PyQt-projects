@@ -1,7 +1,7 @@
 import sqlite3
 from sqlite3 import Error
 
-import pandas
+#import pandas
 
 
 class Database:
@@ -10,45 +10,38 @@ class Database:
         self.cur = self.conn.cursor()
 
         self.sqlCreatePeopleTable = "CREATE TABLE IF NOT EXISTS people (" \
-                                    "person_id TEXT PRIMARY KEY UNIQUE NOT NULL," \
-                                    "person_first_name TEXT NOT NULL," \
-                                    "person_last_name TEXT NOT NULL," \
+                                    "person_id INTEGER PRIMARY KEY AUTOINCREMENT," \
+                                    "person_first_name TEXT," \
+                                    "person_last_name TEXT," \
                                     "person_title TEXT," \
                                     "person_phone TEXT," \
-                                    "person_email TEXT UNIQUE NOT NULL," \
+                                    "person_email TEXT," \
                                     "person_location TEXT," \
                                     "person_empl_type TEXT" \
                                     ")"
         self.sqlCreateFacilitiesTable = "CREATE TABLE IF NOT EXISTS facilities (" \
-                                        "facility_id TEXT PRIMARY KEY UNIQUE NOT NULL," \
-                                        "facility_name TEXT," \
-                                        "facility_location TEXT," \
-                                        "facility_phone TEXT NOT NULL," \
-                                        "facility_email TEXT NOT NULL," \
-                                        "facility_supervisor TEXT NOT NULL," \
-                                        "FOREIGN KEY (facility_supervisor) REFERENCES people (person_id)" \
+                                        "facility_id INTEGER PRIMARY KEY AUTOINCREMENT, " \
+                                        "facility_name TEXT, " \
+                                        "facility_location TEXT, " \
+                                        "facility_phone TEXT NOT NULL, " \
+                                        "facility_email TEXT NOT NULL, " \
+                                        "facility_supervisor TEXT NOT NULL" \
                                         ")"
         self.sqlCreateIssuesTable = "CREATE TABLE IF NOT EXISTS issues (" \
-                                    "id SERIAL PRIMARY KEY UNIQUE NOT NULL," \
-                                    "issue_id TEXT UNIQUE NOT NULL," \
-                                    "issue_date TEXT NOT NULL," \
-                                    "issue_priority TEXT NOT NULL," \
-                                    "issue_observer TEXT NOT NULL," \
+                                    "issue_id INTEGER PRIMARY KEY AUTOINCREMENT," \
+                                    "issue_date TEXT," \
+                                    "issue_priority TEXT," \
+                                    "issue_observer TEXT," \
                                     "issue_team TEXT," \
-                                    "issue_inspector TEXT NOT NULL," \
-                                    "issue_theme TEXT NOT NULL," \
-                                    "issue_facility TEXT NOT NULL," \
-                                    "issue_fac_supervisor TEXT NOT NULL," \
+                                    "issue_inspection TEXT," \
+                                    "issue_theme TEXT," \
+                                    "issue_facility TEXT," \
+                                    "issue_fac_supervisor TEXT," \
                                     "issue_spec_loc TEXT," \
                                     "issue_insp_dept TEXT," \
                                     "issue_insp_contr TEXT," \
                                     "issue_insp_subcontr TEXT," \
-                                    "issue_deadline TEXT NOT NULL," \
-                                    "FOREIGN KEY (issue_observer) REFERENCES people (person_id)," \
-                                    "FOREIGN KEY (issue_facility) REFERENCES facilities (facility_id)," \
-                                    "FOREIGN KEY (issue_fac_supervisor) REFERENCES facilities (facility_supervisor)," \
-                                    "FOREIGN KEY (issue_insp_contr) REFERENCES people (person_id)," \
-                                    "FOREIGN KEY (issue_insp_subcontr) REFERENCES people (person_id)" \
+                                    "issue_deadline TEXT" \
                                     ")"
 
         if self.conn is not None:

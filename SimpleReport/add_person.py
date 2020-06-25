@@ -5,8 +5,12 @@ from PySide2.QtCore import *
 import sqlite3
 from PIL import Image
 
-conn = sqlite3.connect("simplereport-data.db")
-cur = conn.cursor()
+import backend
+
+db = backend.Database("simplereport-data.db")
+
+# conn = sqlite3.connect("simplereport-data.db")
+# cur = conn.cursor()
 
 defaultImg = "assets/icons/logo-dark.png"
 
@@ -48,6 +52,7 @@ class AddPerson(QWidget):
         self.attachPhotoBtn = QPushButton("Attach photo")
 
         self.addPersonBtn = QPushButton("Add person")
+        self.addPersonBtn.clicked.connect(self.addPerson)
 
 
     def layouts(self):
@@ -86,7 +91,36 @@ class AddPerson(QWidget):
 
 
 
+    def addPerson(self):
+        firstName = self.firstNameEntry.text()
+        lastName = self.lastNameEntry.text()
+        title = self.titleEntry.text()
+        phone = self.phoneEntry.text()
+        email = self.emailEntry.text()
+        location = self.locationEntry.text()
+        emplType = self.employmentTypeEntry.currentText()
 
+        if (firstName and lastName != ""):
+            try:
+                query = "INSERT INTO people (person_first_name, person_last_name, person_title, person_phone," \
+                        "person_email, person_location, person_empl_type) VALUES (?, ?, ?, ?, ?, ?, ?)"
+
+                db.cur.execute(query, (firstName, lastName, title, phone, email, location, emplType))
+                db.conn.commit()
+                QMessageBox.information(self, "Info", "Member has been added")
+
+                # Clear input fields
+                self.firstNameEntry.setText("")
+                self.lastNameEntry.setText("")
+                self.titleEntry.setText("")
+                self.phoneEntry.setText("")
+                self.emailEntry.setText("")
+                self.locationEntry.setText("")
+                self.employmentTypeEntry.setCurrentText("")
+            except:
+                QMessageBox.information(self, "Info", "Member has not been added")
+        else:
+            QMessageBox.information(self, "Info", "Fields cannot be empty")
 
 
 
