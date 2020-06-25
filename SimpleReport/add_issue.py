@@ -5,6 +5,8 @@ from PySide2.QtCore import *
 import sqlite3
 from PIL import Image
 
+# Comment
+
 import datetime
 
 import backend
