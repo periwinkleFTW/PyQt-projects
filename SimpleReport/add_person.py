@@ -6,6 +6,7 @@ import sqlite3
 from PIL import Image
 
 import backend
+import main_app
 
 db = backend.Database("simplereport-data.db")
 
@@ -123,6 +124,7 @@ class AddPerson(QWidget):
         else:
             QMessageBox.information(self, "Info", "Fields cannot be empty")
 
+        self.close()
 
 
 

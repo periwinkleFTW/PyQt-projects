@@ -106,6 +106,8 @@ class AddFacility(QWidget):
         else:
             QMessageBox.information(self, "Info", "Fields cannot be empty")
 
+        self.close()
+
 
 
 

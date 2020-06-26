@@ -170,3 +170,5 @@ class AddIssue(QWidget):
                 QMessageBox.information(self, "Info", "Issue has not been added")
         else:
             QMessageBox.information(self, "Info", "Fields cannot be empty")
+
+        self.close()

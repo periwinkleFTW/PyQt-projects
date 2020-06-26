@@ -87,9 +87,8 @@ class Main(QMainWindow):
         self.refreshIssuesBtn.clicked.connect(self.displayIssues)
         self.addIssue = QPushButton("Add issue")
         self.addIssue.clicked.connect(self.funcAddIssue)
-        self.viewIssue = QPushButton("View issue")
+        self.viewIssue = QPushButton("View/Edit issue")
         self.viewIssue.clicked.connect(self.selectedIssue)
-        self.editIssue = QPushButton("Edit issue")
         self.closeIssueBtn = QPushButton("Close issue")
         self.closeIssueBtn.clicked.connect(self.funcCloseIssue)
         self.deleteIssue = QPushButton("Delete issue")
@@ -137,9 +136,8 @@ class Main(QMainWindow):
         self.refreshPeopleBtn.clicked.connect(self.displayPeople)
         self.addPerson = QPushButton("Add person")
         self.addPerson.clicked.connect(self.funcAddPerson)
-        self.viewPerson = QPushButton("View person")
+        self.viewPerson = QPushButton("View/Edit person")
         self.viewPerson.clicked.connect(self.selectedPerson)
-        self.editPerson = QPushButton("Edit person")
         self.deletePerson = QPushButton("Delete person")
 
         # Tab 3 (Facilities) widgets ###########################################################
@@ -183,9 +181,8 @@ class Main(QMainWindow):
         self.refreshFacilitiesBtn.clicked.connect(self.displayFacilities)
         self.addFacility = QPushButton("Add facility")
         self.addFacility.clicked.connect(self.funcAddFacility)
-        self.viewFacility = QPushButton("View facility")
+        self.viewFacility = QPushButton("View/Edit facility")
         self.viewFacility.clicked.connect(self.selectedFacility)
-        self.editFacility = QPushButton("Edit facility")
         self.deleteFacility = QPushButton("Delete facility")
 
         # Tab 4 (Statistics) widgets ###########################################################
@@ -239,10 +236,9 @@ class Main(QMainWindow):
         self.issuesBottomRightLayout.addWidget(self.refreshIssuesBtn, 5)
         self.issuesBottomRightLayout.addWidget(self.addIssue, 5)
         self.issuesBottomRightLayout.addWidget(self.viewIssue, 5)
-        self.issuesBottomRightLayout.addWidget(self.editIssue, 5)
         self.issuesBottomRightLayout.addWidget(self.closeIssueBtn, 5)
         self.issuesBottomRightLayout.addWidget(self.deleteIssue, 5)
-        self.issuesBottomRightLayout.addWidget(self.issuesBottomRightGroupBoxFiller, 70)
+        self.issuesBottomRightLayout.addWidget(self.issuesBottomRightGroupBoxFiller, 75)
         self.issuesBottomRightGroupBox.setLayout(self.issuesBottomRightLayout)
 
         self.issuesMainBottomLayout.addWidget(self.issuesBottomLeftGroupBox, 90)
@@ -296,9 +292,8 @@ class Main(QMainWindow):
         self.peopleBottomRightLayout.addWidget(self.refreshPeopleBtn, 5)
         self.peopleBottomRightLayout.addWidget(self.addPerson, 5)
         self.peopleBottomRightLayout.addWidget(self.viewPerson, 5)
-        self.peopleBottomRightLayout.addWidget(self.editPerson, 5)
         self.peopleBottomRightLayout.addWidget(self.deletePerson, 5)
-        self.peopleBottomRightLayout.addWidget(self.peopleBottomRightGroupBoxFiller, 70)
+        self.peopleBottomRightLayout.addWidget(self.peopleBottomRightGroupBoxFiller, 75)
         self.peopleBottomRightGroupBox.setLayout(self.peopleBottomRightLayout)
 
         self.peopleMainBottomLayout.addWidget(self.peopleBottomLeftGroupBox, 90)
@@ -351,9 +346,8 @@ class Main(QMainWindow):
         self.facilitiesBottomRightLayout.addWidget(self.refreshFacilitiesBtn, 5)
         self.facilitiesBottomRightLayout.addWidget(self.addFacility, 5)
         self.facilitiesBottomRightLayout.addWidget(self.viewFacility, 5)
-        self.facilitiesBottomRightLayout.addWidget(self.editFacility, 5)
         self.facilitiesBottomRightLayout.addWidget(self.deleteFacility, 5)
-        self.facilitiesBottomRightLayout.addWidget(self.facilitiesBottomRightGroupBoxFiller, 70)
+        self.facilitiesBottomRightLayout.addWidget(self.facilitiesBottomRightGroupBoxFiller, 75)
         self.facilitiesBottomRightGroupBox.setLayout(self.facilitiesBottomRightLayout)
 
         self.facilitiesMainBottomLayout.addWidget(self.facilitiesBottomLeftGroupBox, 90)
@@ -370,6 +364,7 @@ class Main(QMainWindow):
 
     def funcAddPerson(self):
         self.newPerson = add_person.AddPerson()
+        self.displayPeople()
 
     def funcAddFacility(self):
         self.newFacility = add_facility.AddFacility()
@@ -426,13 +421,12 @@ class Main(QMainWindow):
     # Selected items
     def selectedIssue(self):
         global issueId
-        listIssue = []
 
-        for i in range(0, self.issuesTable.columnCount()):
-            listIssue.append(self.issuesTable.item(self.issuesTable.currentRow(), i).text())
+        row = self.issuesTable.currentRow()
+        issueId = self.issuesTable.item(row, 0).text()
+        print(issueId)
 
-        issueId = listIssue[0]
-        self.display = self.DisplayIssue()
+        self.display = DisplayIssue()
         self.display.show()
 
     def selectedPerson(self):
@@ -643,36 +637,33 @@ class Main(QMainWindow):
 
 
     def funcCloseIssue(self):
-        #issueId
-        listIssue = []
-
-        for i in range(0, self.issuesTable.columnCount()):
-            listIssue.append(self.issuesTable.item(self.issuesTable.currentRow(), i).text())
-
-        issueId = listIssue[0]
+        global issueId
+        row = self.issuesTable.currentRow()
+        issueId = self.issuesTable.item(row, 0).text()
+        print(type(issueId))
 
         try:
-            query = "UPDATE issues SET status='Closed' WHERE issue_id = ?"
+            query = "UPDATE issues SET status='Closed' WHERE issue_id=?"
 
+            print("Before exec")
             db.cur.execute(query, issueId)
             db.conn.commit()
+            print("after commit")
 
-            QMessageBox.information(self, "Info", "Issue " + issueId + " closed successfully")
+            QMessageBox.information(self, "Info", "Issue closed successfully")
             self.displayIssues()
+
         except:
             QMessageBox.information(self, "Info", "Something went wrong")
-            self.close()
+
 
     def funcDeleteIssue(self):
-        #issueId
-        listIssue = []
+        global issueId
+        row = self.issuesTable.currentRow()
+        issueId = self.issuesTable.item(row, 0).text()
+        print(issueId)
 
-        for i in range(0, self.issuesTable.columnCount()):
-            listIssue.append(self.issuesTable.item(self.issuesTable.currentRow(), i).text())
-
-        issueId = listIssue[0]
-
-        mbox = QMessageBox.question(self, "Warning", "Are you sure you want to delete issue " + issueId + "?",
+        mbox = QMessageBox.question(self, "Warning", "Are you sure you want to delete issue " + str(issueId) + "?",
                                     QMessageBox.Yes | QMessageBox.Cancel, QMessageBox.Cancel)
         print(issueId)
         if (mbox == QMessageBox.Yes):
@@ -682,16 +673,10 @@ class Main(QMainWindow):
                 db.cur.execute(query, issueId)
                 db.conn.commit()
 
-                QMessageBox.information(self, "Info", "Issue " + issueId + " was deleted")
+                QMessageBox.information(self, "Info", "Issue was deleted")
                 self.displayIssues()
             except:
                 QMessageBox.information(self, "Info", "No changes made")
-        else:
-            self.close()
-
-
-
-
 
 
 
@@ -712,6 +697,8 @@ class DisplayIssue(QWidget):
 
     def issueDetails(self):
         global issueId
+        # row = self.issuesTable.currentRow()
+        # issueId = self.issuesTable.item(row, 0).text()
 
         query = "SELECT * FROM issues WHERE issue_id=?"
 
@@ -743,7 +730,7 @@ class DisplayIssue(QWidget):
         self.titleText.setAlignment(Qt.AlignCenter)
         # Bottom layout widgets
         self.idEntry = QLineEdit()
-        self.idEntry.setText(self.id)
+        self.idEntry.setText(str(self.id))
         self.dateEntry = QLineEdit()
         self.dateEntry.setText(self.date)
         self.priorityEntry = QLineEdit()
@@ -782,7 +769,7 @@ class DisplayIssue(QWidget):
 
         # Add widgets
         self.topLayout.addWidget(self.titleText)
-        self.topLayout.addWidget(self.personImg)
+        self.topLayout.addWidget(self.issueImg)
         self.topFrame.setLayout(self.topLayout)
 
         self.bottomLayout.addRow("ID: ", self.idEntry)
@@ -797,7 +784,7 @@ class DisplayIssue(QWidget):
         self.bottomLayout.addRow("Specific location: ", self.specLocationEntry)
         self.bottomLayout.addRow("Inspected department: ", self.inspectedDeptEntry)
         self.bottomLayout.addRow("Inspected contractor: ", self.inspectedContrEntry)
-        self.bottomLayout.addRow("Inspected subcontractor: ", self.inspectedSubcontr)
+        self.bottomLayout.addRow("Inspected subcontractor: ", self.inspectedSubcontrEntry)
         self.bottomLayout.addRow("Deadline: ", self.deadlineEntry)
         self.bottomLayout.addRow("", self.updateBtn)
         self.bottomLayout.addRow("", self.deleteBtn)
@@ -850,7 +837,7 @@ class DisplayPerson(QWidget):
         self.titleText.setAlignment(Qt.AlignCenter)
         # Bottom layout widgets
         self.idEntry = QLineEdit()
-        self.idEntry.setText(self.id)
+        self.idEntry.setText(str(self.id))
         self.firstNameEntry = QLineEdit()
         self.firstNameEntry.setText(self.firstName)
         self.lastNameEntry = QLineEdit()
@@ -937,7 +924,7 @@ class DisplayFacility(QWidget):
         self.titleText.setAlignment(Qt.AlignCenter)
         # Bottom layout widgets
         self.idEntry = QLineEdit()
-        self.idEntry.setText(self.id)
+        self.idEntry.setText(str(self.id))
         self.nameEntry = QLineEdit()
         self.nameEntry.setText(self.name)
         self.locationEntry = QLineEdit()
