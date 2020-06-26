@@ -25,7 +25,6 @@ class DisplayPerson(QWidget):
         self.layouts()
 
     def personDetails(self):
-
         row = self.Parent.peopleTable.currentRow()
         personId = self.Parent.peopleTable.item(row, 0).text()
 
@@ -65,10 +64,16 @@ class DisplayPerson(QWidget):
         self.emailEntry.setText(self.email)
         self.locationEntry = QLineEdit()
         self.locationEntry.setText(self.location)
-        self.emplTypeEntry = QLineEdit()
-        self.emplTypeEntry.setText(self.emplType)
+
+        emplTypes = ["Employee", "Contractor", "Subcontractor"]
+        self.employmentTypeEntry = QComboBox()
+        self.employmentTypeEntry.addItems(emplTypes)
+        self.employmentTypeEntry.setCurrentText(self.emplType)
+
         self.updateBtn = QPushButton("Update")
+        self.updateBtn.clicked.connect(self.updatePerson)
         self.deleteBtn = QPushButton("Delete")
+        self.deleteBtn.clicked.connect(self.Parent.funcDeletePerson)
 
     def layouts(self):
         self.mainLayout = QVBoxLayout()
@@ -89,7 +94,7 @@ class DisplayPerson(QWidget):
         self.bottomLayout.addRow("Phone: ", self.phoneEntry)
         self.bottomLayout.addRow("Email: ", self.emailEntry)
         self.bottomLayout.addRow("Location: ", self.locationEntry)
-        self.bottomLayout.addRow("Employment type: ", self.emplTypeEntry)
+        self.bottomLayout.addRow("Employment type: ", self.employmentTypeEntry)
         self.bottomLayout.addRow("", self.updateBtn)
         self.bottomLayout.addRow("", self.deleteBtn)
         self.bottomFrame.setLayout(self.bottomLayout)
@@ -98,3 +103,32 @@ class DisplayPerson(QWidget):
         self.mainLayout.addWidget(self.bottomFrame)
 
         self.setLayout(self.mainLayout)
+
+    def updatePerson(self):
+        row = self.Parent.peopleTable.currentRow()
+        personId = self.Parent.peopleTable.item(row, 0).text()
+
+        firstName = self.firstNameEntry.text()
+        lastName = self.lastNameEntry.text()
+        title = self.titleEntry.text()
+        phone = self.phoneEntry.text()
+        email = self.emailEntry.text()
+        location = self.locationEntry.text()
+        emplType = self.employmentTypeEntry.currentText()
+
+        if (firstName and lastName and title and phone and email and emplType != ""):
+            try:
+                query = "UPDATE people SET person_first_name=?, person_last_name=?, person_title=?," \
+                        "person_phone=?, person_email=?, person_location=?, person_empl_type=? WHERE person_id=?"
+                db.cur.execute(query, (firstName, lastName, title, phone, email, location, emplType, personId))
+                db.conn.commit()
+                QMessageBox.information(self, "Info", "Person info updated")
+            except:
+                QMessageBox.information(self, "Info", "No changes made")
+        else:
+            QMessageBox.information(self, "Info", "Fields cannot be empty")
+
+        self.Parent.displayPeople()
+        self.close()
+
+

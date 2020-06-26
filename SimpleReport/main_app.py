@@ -621,7 +621,6 @@ class Main(QMainWindow):
                     self.peopleTable.setItem(row_number, column_number, QTableWidgetItem(str(data)))
 
 
-
     def funcCloseIssue(self):
         #global issueId
         row = self.issuesTable.currentRow()
@@ -652,9 +651,8 @@ class Main(QMainWindow):
         except:
             QMessageBox.information(self, "Info", "Something went wrong")
 
-
+    # Delete functions
     def funcDeleteIssue(self):
-        global issueId
         row = self.issuesTable.currentRow()
         issueId = self.issuesTable.item(row, 0).text()
 
@@ -673,9 +671,10 @@ class Main(QMainWindow):
             except:
                 QMessageBox.information(self, "Info", "No changes made")
 
+        self.displayIssue.close()
+
 
     def funcDeletePerson(self):
-        global personId
         row = self.peopleTable.currentRow()
         personId = self.peopleTable.item(row, 0).text()
 
@@ -694,8 +693,11 @@ class Main(QMainWindow):
             except:
                 QMessageBox.information(self, "Info", "No changes made")
 
+        self.displayPerson.close()
+
+
+
     def funcDeleteFacility(self):
-        global facilityId
         row = self.facilitiesTable.currentRow()
         facilityId = self.facilitiesTable.item(row, 0).text()
 
@@ -713,6 +715,9 @@ class Main(QMainWindow):
                 self.displayFacilities()
             except:
                 QMessageBox.information(self, "Info", "No changes made")
+
+        self.displayFacility.close()
+
 
 
 
