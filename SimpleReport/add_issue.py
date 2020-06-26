@@ -15,12 +15,14 @@ defaultImg = "assets/icons/logo-dark.png"
 
 
 class AddIssue(QWidget):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, parent):
+        QWidget.__init__(self)
         self.setWindowTitle("Add issue")
         self.setWindowIcon(QIcon("assets/icons/icon.ico"))
         self.setGeometry(450, 150, 750, 950)
         # self.setFixedSize(self.size())
+
+        self.Parent = parent
 
         self.UI()
         self.show()
@@ -169,4 +171,5 @@ class AddIssue(QWidget):
         else:
             QMessageBox.information(self, "Info", "Fields cannot be empty")
 
+        self.Parent.displayIssues()
         self.close()

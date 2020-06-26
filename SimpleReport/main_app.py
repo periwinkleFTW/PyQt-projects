@@ -11,7 +11,7 @@ db = backend.Database("simplereport-data.db")
 
 class Main(QMainWindow):
     def __init__(self):
-        super().__init__()
+        QMainWindow.__init__(self)
         self.setWindowTitle("SimpleReport")
         # self.setWindowIcon(QIcon("assets/icons/logo-dark.png"))
         self.setGeometry(150, 150, 1470, 750)
@@ -362,14 +362,13 @@ class Main(QMainWindow):
         self.tab3.setLayout(self.facilitiesMainLayout)
 
     def funcAddIssue(self):
-        self.newIssue = add_issue.AddIssue()
+        self.newIssue = add_issue.AddIssue(self)
 
     def funcAddPerson(self):
-        self.newPerson = add_person.AddPerson()
-        self.displayPeople()
+        self.newPerson = add_person.AddPerson(self)
 
     def funcAddFacility(self):
-        self.newFacility = add_facility.AddFacility()
+        self.newFacility = add_facility.AddFacility(self)
 
     # Populating tables
     def displayIssues(self):

@@ -13,12 +13,14 @@ db = backend.Database("simplereport-data.db")
 defaultImg = "assets/icons/logo-dark.png"
 
 class AddPerson(QWidget):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, parent):
+        QWidget.__init__(self)
         self.setWindowTitle("Add person")
         self.setWindowIcon(QIcon("assets/icons/icon.ico"))
         self.setGeometry(450, 150, 750, 650)
         #self.setFixedSize(self.size())
+
+        self.Parent = parent
 
         self.UI()
         self.show()
@@ -124,6 +126,7 @@ class AddPerson(QWidget):
         else:
             QMessageBox.information(self, "Info", "Fields cannot be empty")
 
+        self.Parent.displayPeople()
         self.close()
 
 
