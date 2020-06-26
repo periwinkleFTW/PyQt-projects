@@ -146,8 +146,6 @@ class AddIssue(QWidget):
         inspectedSubcontr = self.inspectedSubcontractorEntry.currentText()
         deadline = self.deadlineEntry.text()
 
-        print("Before query")
-
         if date and deadline != "":
             try:
                 query = "INSERT INTO issues (issue_date, issue_priority, issue_observer, issue_team," \

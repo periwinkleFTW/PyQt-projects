@@ -48,9 +48,9 @@ class Database:
                                     ")"
 
         if self.conn is not None:
+            self.create_table(self.conn, self.sqlCreateIssuesTable)
             self.create_table(self.conn, self.sqlCreatePeopleTable)
             self.create_table(self.conn, self.sqlCreateFacilitiesTable)
-            self.create_table(self.conn, self.sqlCreateIssuesTable)
         else:
             print("Error! Cannot establish database connection")
 

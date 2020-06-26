@@ -374,8 +374,7 @@ class Main(QMainWindow):
         for i in reversed(range(self.issuesTable.rowCount())):
             self.issuesTable.removeRow(i)
 
-        cur = db.cur
-        issues = cur.execute("SELECT * FROM issues")
+        issues = db.cur.execute("SELECT * FROM issues")
 
         for row_data in issues:
             row_number = self.issuesTable.rowCount()
@@ -424,27 +423,25 @@ class Main(QMainWindow):
 
         row = self.issuesTable.currentRow()
         issueId = self.issuesTable.item(row, 0).text()
-        print(issueId)
 
         self.display = DisplayIssue()
         self.display.show()
 
     def selectedPerson(self):
         global personId
-        listPerson = []
-        for i in range(0, self.peopleTable.columnCount()):
-            listPerson.append(self.peopleTable.item(self.peopleTable.currentRow(), i).text())
-        personId = listPerson[0]
+
+        row = self.peopleTable.currentRow()
+        personId = self.peopleTable.item(row, 0).text()
+
         self.displayPerson = DisplayPerson()
         self.displayPerson.show()
 
     def selectedFacility(self):
         global facilityId
-        listFacility = []
-        ######## I changed the range to 6 because it throws errors when trying to read empty cells###
-        for i in range(0, 6):
-            listFacility.append(self.facilitiesTable.item(self.facilitiesTable.currentRow(), i).text())
-        facilityId = listFacility[0]
+
+        row = self.facilitiesTable.currentRow()
+        facilityId = self.facilitiesTable.item(row, 0).text()
+
         self.displayFacility = DisplayFacility()
         self.displayFacility.show()
 
@@ -637,21 +634,31 @@ class Main(QMainWindow):
 
 
     def funcCloseIssue(self):
-        global issueId
+        #global issueId
         row = self.issuesTable.currentRow()
-        issueId = self.issuesTable.item(row, 0).text()
-        print(type(issueId))
+        issueId = int(self.issuesTable.item(row, 0).text())
+
+        print(issueId, type(issueId))
+
 
         try:
-            query = "UPDATE issues SET status='Closed' WHERE issue_id=?"
+            statusQuery = "SELECT status FROM issues WHERE issue_id=?"
+            currentStatus = db.cur.execute(statusQuery, (issueId,)).fetchone()
+            print(currentStatus)
 
-            print("Before exec")
-            db.cur.execute(query, issueId)
-            db.conn.commit()
-            print("after commit")
+            if currentStatus[0] == "Open":
+                query = "UPDATE issues SET status='Closed' WHERE issue_id=?"
 
-            QMessageBox.information(self, "Info", "Issue closed successfully")
-            self.displayIssues()
+                print("Before exec")
+                db.cur.execute(query, (issueId,))
+                print("Before commit")
+                db.conn.commit()
+                print("after commit")
+
+                QMessageBox.information(self, "Info", "Issue closed successfully")
+                self.displayIssues()
+            else:
+                QMessageBox.information(self, "Info", "Issue is already closed")
 
         except:
             QMessageBox.information(self, "Info", "Something went wrong")
@@ -661,16 +668,15 @@ class Main(QMainWindow):
         global issueId
         row = self.issuesTable.currentRow()
         issueId = self.issuesTable.item(row, 0).text()
-        print(issueId)
 
-        mbox = QMessageBox.question(self, "Warning", "Are you sure you want to delete issue " + str(issueId) + "?",
+        mbox = QMessageBox.question(self, "Warning", "Are you sure you want to delete issue " + issueId + "?",
                                     QMessageBox.Yes | QMessageBox.Cancel, QMessageBox.Cancel)
-        print(issueId)
+
         if (mbox == QMessageBox.Yes):
             try:
                 query = "DELETE FROM issues WHERE issue_id = ?"
 
-                db.cur.execute(query, issueId)
+                db.cur.execute(query, (issueId,))
                 db.conn.commit()
 
                 QMessageBox.information(self, "Info", "Issue was deleted")
