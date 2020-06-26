@@ -69,8 +69,8 @@ class DisplayIssue(QWidget):
         self.observerEntry.setText(self.observer)
         self.revTeamEntry = QLineEdit()
         self.revTeamEntry.setText(self.revTeam)
-        self.inspectorNameEntry = QLineEdit()
-        self.inspectorNameEntry.setText(self.inspectorName)
+        self.inspectionNameEntry = QLineEdit()
+        self.inspectionNameEntry.setText(self.inspectorName)
         self.themeEntry = QLineEdit()
         self.themeEntry.setText(self.theme)
         self.facilityEntry = QLineEdit()
@@ -85,6 +85,8 @@ class DisplayIssue(QWidget):
         self.inspectedContrEntry.setText(self.inspectedContr)
         self.inspectedSubcontrEntry = QLineEdit()
         self.inspectedSubcontrEntry.setText(self.inspectedSubcontr)
+        self.statusEntry = QComboBox()
+        self.statusEntry.setCurrentText(self.status)
         self.deadlineEntry = QLineEdit()
         self.deadlineEntry.setText(self.deadline)
 
@@ -93,7 +95,9 @@ class DisplayIssue(QWidget):
         self.statusEntry.addItems(statusList)
 
         self.updateBtn = QPushButton("Update")
+        self.updateBtn.clicked.connect(self.updateIssue)
         self.deleteBtn = QPushButton("Delete")
+        self.deleteBtn.clicked.connect(self.Parent.funcDeleteIssue)
 
     def layouts(self):
         self.mainLayout = QVBoxLayout()
@@ -112,7 +116,7 @@ class DisplayIssue(QWidget):
         self.bottomLayout.addRow("Priority: ", self.priorityEntry)
         self.bottomLayout.addRow("Observer: ", self.observerEntry)
         self.bottomLayout.addRow("Revision Team: ", self.revTeamEntry)
-        self.bottomLayout.addRow("Inspector name: ", self.inspectorNameEntry)
+        self.bottomLayout.addRow("Inspector name: ", self.inspectionNameEntry)
         self.bottomLayout.addRow("HSE theme: ", self.themeEntry)
         self.bottomLayout.addRow("Facility: ", self.facilityEntry)
         self.bottomLayout.addRow("Facility supervisor: ", self.facilitySupervisorEntry)
@@ -130,3 +134,60 @@ class DisplayIssue(QWidget):
         self.mainLayout.addWidget(self.bottomFrame)
 
         self.setLayout(self.mainLayout)
+
+    def updateIssue(self):
+        row = self.Parent.issuesTable.currentRow()
+        issueId = self.Parent.issuesTable.item(row, 0).text()
+
+        date = self.dateEntry.text()
+        priority = self.priorityEntry.text()
+        observer = self.observerEntry.text()
+        revTeam = self.revTeamEntry.text()
+        inspectionName = self.inspectionNameEntry.text()
+        theme = self.themeEntry.text()
+        facility = self.facilityEntry.text()
+        facilitySupervisor = self.facilitySupervisorEntry.text()
+        specLocation = self.specLocationEntry.text()
+        inspDept = self.inspectedDeptEntry.text()
+        inspContr = self.inspectedContrEntry.text()
+        inspSubcontr = self.inspectedSubcontrEntry.text()
+        status_ = self.statusEntry.currentText()
+        deadline = self.deadlineEntry.text()
+
+        print(date)
+        print(priority)
+        print(observer)
+        print(revTeam)
+        print(inspectionName)
+        print(theme)
+        print(facility)
+        print(facilitySupervisor)
+        print(specLocation)
+        print(inspDept)
+        print(inspContr)
+        print(inspSubcontr)
+        print(status_)
+        print(deadline)
+
+        if (date and priority and observer and revTeam and inspectionName and theme and facility
+                and facilitySupervisor and specLocation and inspDept and deadline != ""):
+            try:
+                query = "UPDATE issues SET issue_date=?, issue_priority=?, issue_observer=?, issue_team=?," \
+                        "issue_inspection=?, issue_theme=?, issue_facility=?, issue_fac_supervisor=?," \
+                        "issue_spec_loc=?, issue_insp_dept=?, issue_insp_contr=?, issue_insp_subcontr=?," \
+                        "issue_deadline=?, status=? WHERE issue_id=? "
+                print(issueId)
+                print("Before exec")
+                db.cur.execute(query, (date, priority, observer, revTeam, inspectionName, theme, facility,
+                                       facilitySupervisor, specLocation, inspDept, inspContr, inspSubcontr,
+                                       status_, deadline, issueId))
+                db.conn.commit()
+                print("After commit")
+                QMessageBox.information(self, "Info", "Issue info updated")
+            except:
+                QMessageBox.information(self, "Info", "No changes made")
+        else:
+            QMessageBox.information(self, "Info", "Fields cannot be empty")
+
+        self.Parent.displayIssues()
+        self.close()
