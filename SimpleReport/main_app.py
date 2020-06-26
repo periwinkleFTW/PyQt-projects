@@ -423,8 +423,8 @@ class Main(QMainWindow):
 
     # Selected items
     def selectedIssue(self):
-        self.display = display_issue.DisplayIssue(self)
-        self.display.show()
+        self.displayIssue = display_issue.DisplayIssue(self)
+        self.displayIssue.show()
 
     def selectedPerson(self):
         self.displayPerson = display_person.DisplayPerson(self)

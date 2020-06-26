@@ -180,7 +180,7 @@ class DisplayIssue(QWidget):
                 print("Before exec")
                 db.cur.execute(query, (date, priority, observer, revTeam, inspectionName, theme, facility,
                                        facilitySupervisor, specLocation, inspDept, inspContr, inspSubcontr,
-                                       status_, deadline, issueId))
+                                       deadline, status_, issueId))
                 db.conn.commit()
                 print("After commit")
                 QMessageBox.information(self, "Info", "Issue info updated")
