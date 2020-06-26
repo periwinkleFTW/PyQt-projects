@@ -13,7 +13,7 @@ defaultImg = "assets/icons/logo-dark.png"
 
 class AddFacility(QWidget):
     def __init__(self, parent):
-        super().__init__()
+        QWidget.__init__(self)
         self.setWindowTitle("Add facility")
         self.setWindowIcon(QIcon("assets/icons/icon.ico"))
         self.setGeometry(450, 150, 750, 650)
@@ -68,7 +68,6 @@ class AddFacility(QWidget):
 
         # Add widgets to middle layout
         self.bottomLayout.addWidget(self.facilityInfoTitleText)
-        self.bottomLayout.addRow(QLabel("Facility ID: "), self.facilityIdEntry)
         self.bottomLayout.addRow(QLabel("Facility name: "), self.facilityNameEntry)
         self.bottomLayout.addRow(QLabel("Location: "), self.facilityLocationEntry)
         self.bottomLayout.addRow(QLabel("Phone: "), self.facilityPhoneEntry)
