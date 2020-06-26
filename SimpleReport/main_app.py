@@ -139,6 +139,7 @@ class Main(QMainWindow):
         self.viewPerson = QPushButton("View/Edit person")
         self.viewPerson.clicked.connect(self.selectedPerson)
         self.deletePerson = QPushButton("Delete person")
+        self.deletePerson.clicked.connect(self.funcDeletePerson)
 
         # Tab 3 (Facilities) widgets ###########################################################
         # Top layout (search facilities) widgets
@@ -184,6 +185,7 @@ class Main(QMainWindow):
         self.viewFacility = QPushButton("View/Edit facility")
         self.viewFacility.clicked.connect(self.selectedFacility)
         self.deleteFacility = QPushButton("Delete facility")
+        self.deleteFacility.clicked.connect(self.funcDeleteFacility)
 
         # Tab 4 (Statistics) widgets ###########################################################
         self.totalIssuesLabel = QLabel()
@@ -685,6 +687,46 @@ class Main(QMainWindow):
                 QMessageBox.information(self, "Info", "No changes made")
 
 
+    def funcDeletePerson(self):
+        global personId
+        row = self.peopleTable.currentRow()
+        personId = self.peopleTable.item(row, 0).text()
+
+        mbox = QMessageBox.question(self, "Warning", "Are you sure you want to delete this person?",
+                                    QMessageBox.Yes | QMessageBox.Cancel, QMessageBox.Cancel)
+
+        if (mbox == QMessageBox.Yes):
+            try:
+                query = "DELETE FROM people WHERE person_id = ?"
+
+                db.cur.execute(query, (personId,))
+                db.conn.commit()
+
+                QMessageBox.information(self, "Info", "Person was deleted")
+                self.displayPeople()
+            except:
+                QMessageBox.information(self, "Info", "No changes made")
+
+    def funcDeleteFacility(self):
+        global facilityId
+        row = self.facilitiesTable.currentRow()
+        facilityId = self.facilitiesTable.item(row, 0).text()
+
+        mbox = QMessageBox.question(self, "Warning", "Are you sure you want to delete this facility?",
+                                    QMessageBox.Yes | QMessageBox.Cancel, QMessageBox.Cancel)
+
+        if (mbox == QMessageBox.Yes):
+            try:
+                query = "DELETE FROM facilities WHERE facility_id = ?"
+
+                db.cur.execute(query, (facilityId,))
+                db.conn.commit()
+
+                QMessageBox.information(self, "Info", "Facility was deleted")
+                self.displayFacilities()
+            except:
+                QMessageBox.information(self, "Info", "No changes made")
+
 
 
 class DisplayIssue(QWidget):
@@ -725,6 +767,7 @@ class DisplayIssue(QWidget):
         self.inspectedContr = issue[11]
         self.inspectedSubcontr = issue[12]
         self.deadline = issue[13]
+        self.status = issue[14]
 
     def widgets(self):
         # Top layout widgets
@@ -735,8 +778,7 @@ class DisplayIssue(QWidget):
         self.titleText = QLabel("Display issue")
         self.titleText.setAlignment(Qt.AlignCenter)
         # Bottom layout widgets
-        self.idEntry = QLineEdit()
-        self.idEntry.setText(str(self.id))
+        self.idEntry = QLabel(str(self.id))
         self.dateEntry = QLineEdit()
         self.dateEntry.setText(self.date)
         self.priorityEntry = QLineEdit()
@@ -763,6 +805,11 @@ class DisplayIssue(QWidget):
         self.inspectedSubcontrEntry.setText(self.inspectedSubcontr)
         self.deadlineEntry = QLineEdit()
         self.deadlineEntry.setText(self.deadline)
+
+        statusList = ["Open", "Closed"]
+        self.statusEntry = QComboBox()
+        self.statusEntry.addItems(statusList)
+
         self.updateBtn = QPushButton("Update")
         self.deleteBtn = QPushButton("Delete")
 
@@ -792,6 +839,7 @@ class DisplayIssue(QWidget):
         self.bottomLayout.addRow("Inspected contractor: ", self.inspectedContrEntry)
         self.bottomLayout.addRow("Inspected subcontractor: ", self.inspectedSubcontrEntry)
         self.bottomLayout.addRow("Deadline: ", self.deadlineEntry)
+        self.bottomLayout.addRow("Status: ", self.statusEntry)
         self.bottomLayout.addRow("", self.updateBtn)
         self.bottomLayout.addRow("", self.deleteBtn)
         self.bottomFrame.setLayout(self.bottomLayout)
@@ -842,8 +890,7 @@ class DisplayPerson(QWidget):
         self.titleText = QLabel("Display person")
         self.titleText.setAlignment(Qt.AlignCenter)
         # Bottom layout widgets
-        self.idEntry = QLineEdit()
-        self.idEntry.setText(str(self.id))
+        self.idEntry = QLabel(str(self.id))
         self.firstNameEntry = QLineEdit()
         self.firstNameEntry.setText(self.firstName)
         self.lastNameEntry = QLineEdit()
@@ -929,8 +976,7 @@ class DisplayFacility(QWidget):
         self.titleText = QLabel("Display facility")
         self.titleText.setAlignment(Qt.AlignCenter)
         # Bottom layout widgets
-        self.idEntry = QLineEdit()
-        self.idEntry.setText(str(self.id))
+        self.idEntry = QLabel(str(self.id))
         self.nameEntry = QLineEdit()
         self.nameEntry.setText(self.name)
         self.locationEntry = QLineEdit()
