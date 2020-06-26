@@ -90,8 +90,10 @@ class Main(QMainWindow):
         self.viewIssue = QPushButton("View issue")
         self.viewIssue.clicked.connect(self.selectedIssue)
         self.editIssue = QPushButton("Edit issue")
-        self.closeIssue = QPushButton("Close issue")
+        self.closeIssueBtn = QPushButton("Close issue")
+        self.closeIssueBtn.clicked.connect(self.funcCloseIssue)
         self.deleteIssue = QPushButton("Delete issue")
+        self.deleteIssue.clicked.connect(self.funcDeleteIssue)
 
         # Tab 2 (People) widgets ###########################################################
         # Top layout (search people) widgets
@@ -238,7 +240,7 @@ class Main(QMainWindow):
         self.issuesBottomRightLayout.addWidget(self.addIssue, 5)
         self.issuesBottomRightLayout.addWidget(self.viewIssue, 5)
         self.issuesBottomRightLayout.addWidget(self.editIssue, 5)
-        self.issuesBottomRightLayout.addWidget(self.closeIssue, 5)
+        self.issuesBottomRightLayout.addWidget(self.closeIssueBtn, 5)
         self.issuesBottomRightLayout.addWidget(self.deleteIssue, 5)
         self.issuesBottomRightLayout.addWidget(self.issuesBottomRightGroupBoxFiller, 70)
         self.issuesBottomRightGroupBox.setLayout(self.issuesBottomRightLayout)
@@ -574,7 +576,7 @@ class Main(QMainWindow):
                 for column_number, data in enumerate(row_data):
                     self.issuesTable.setItem(row_number, column_number, QTableWidgetItem(str(data)))
         elif self.lateIssuesRadioBtn.isChecked():
-            query = "SELECT * FROM issues WHERE status='Open' AND closed_on < issue_deadline"
+            query = "SELECT * FROM issues WHERE status='Open' AND issue_deadline < DATETIME('now')"
             issues = db.cur.execute(query).fetchall()
 
             for i in reversed(range(self.issuesTable.rowCount())):
@@ -637,6 +639,60 @@ class Main(QMainWindow):
                 self.peopleTable.insertRow(row_number)
                 for column_number, data in enumerate(row_data):
                     self.peopleTable.setItem(row_number, column_number, QTableWidgetItem(str(data)))
+
+
+
+    def funcCloseIssue(self):
+        #issueId
+        listIssue = []
+
+        for i in range(0, self.issuesTable.columnCount()):
+            listIssue.append(self.issuesTable.item(self.issuesTable.currentRow(), i).text())
+
+        issueId = listIssue[0]
+
+        try:
+            query = "UPDATE issues SET status='Closed' WHERE issue_id = ?"
+
+            db.cur.execute(query, issueId)
+            db.conn.commit()
+
+            QMessageBox.information(self, "Info", "Issue " + issueId + " closed successfully")
+            self.displayIssues()
+        except:
+            QMessageBox.information(self, "Info", "Something went wrong")
+            self.close()
+
+    def funcDeleteIssue(self):
+        #issueId
+        listIssue = []
+
+        for i in range(0, self.issuesTable.columnCount()):
+            listIssue.append(self.issuesTable.item(self.issuesTable.currentRow(), i).text())
+
+        issueId = listIssue[0]
+
+        mbox = QMessageBox.question(self, "Warning", "Are you sure you want to delete issue " + issueId + "?",
+                                    QMessageBox.Yes | QMessageBox.Cancel, QMessageBox.Cancel)
+        print(issueId)
+        if (mbox == QMessageBox.Yes):
+            try:
+                query = "DELETE FROM issues WHERE issue_id = ?"
+
+                db.cur.execute(query, issueId)
+                db.conn.commit()
+
+                QMessageBox.information(self, "Info", "Issue " + issueId + " was deleted")
+                self.displayIssues()
+            except:
+                QMessageBox.information(self, "Info", "No changes made")
+        else:
+            self.close()
+
+
+
+
+
 
 
 

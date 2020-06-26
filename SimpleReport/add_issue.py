@@ -5,8 +5,6 @@ from PySide2.QtCore import *
 import sqlite3
 from PIL import Image
 
-# Comment
-
 import datetime
 
 import backend
@@ -21,7 +19,7 @@ class AddIssue(QWidget):
         super().__init__()
         self.setWindowTitle("Add issue")
         self.setWindowIcon(QIcon("assets/icons/icon.ico"))
-        self.setGeometry(450, 150, 750, 650)
+        self.setGeometry(450, 150, 750, 950)
         # self.setFixedSize(self.size())
 
         self.UI()
@@ -45,7 +43,8 @@ class AddIssue(QWidget):
         # Middle layout widgets
         self.issueInfoTitleText = QLabel("Issue info")
         self.issueInfoTitleText.setAlignment(Qt.AlignCenter)
-        self.dateEntry = QDateEdit()
+        self.dateEntry = QDateTimeEdit()
+        self.dateEntry.setDateTime(QDateTime.currentDateTime())
         self.priorityEntry = QComboBox()
         self.priorityEntry.setEditable(True)
         self.observerEntry = QComboBox()
@@ -67,7 +66,8 @@ class AddIssue(QWidget):
         self.inspectedContractorEntry.setEditable(True)
         self.inspectedSubcontractorEntry = QComboBox()
         self.inspectedSubcontractorEntry.setEditable(True)
-        self.deadlineEntry = QDateEdit()
+        self.deadlineEntry = QDateTimeEdit()
+        self.deadlineEntry.setDateTime(QDateTime.currentDateTime())
 
         # Bottom layout widgets
         self.attachFilesBtn = QPushButton("Attach files")
@@ -146,19 +146,25 @@ class AddIssue(QWidget):
         inspectedSubcontr = self.inspectedSubcontractorEntry.currentText()
         deadline = self.deadlineEntry.text()
 
-        if (date and deadline != ""):
+        print("Before query")
+
+        if date and deadline != "":
             try:
                 query = "INSERT INTO issues (issue_date, issue_priority, issue_observer, issue_team," \
                         "issue_inspection, issue_theme, issue_facility, issue_fac_supervisor," \
-                        "issue_spec_loc, issue_insp_dept, issue_insp_contr, issue_insp_subcontr, issue_deadline) " \
-                        "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+                        "issue_spec_loc, issue_insp_dept, issue_insp_contr, issue_insp_subcontr, issue_deadline, created_on) " \
+                        "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
 
-                print("Before exec")
+                # The purpose of this block is to make created_on timestamp the same format as other dates
+                currentTime = QDateTimeEdit()
+                currentTime.setDateTime(QDateTime.currentDateTime())
+                now = currentTime.text()
+
                 db.cur.execute(query, (date, priority, observer, revisionTeam, inspectionName, observationTheme,
                                        facility, facilitySupervisor, specificLocation, inspectedDept, inspectedContr,
-                                       inspectedSubcontr, deadline))
+                                       inspectedSubcontr, deadline, now))
                 db.conn.commit()
-                print("After exec")
+
                 QMessageBox.information(self, "Info", "Issue has been added")
             except:
                 QMessageBox.information(self, "Info", "Issue has not been added")
