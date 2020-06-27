@@ -82,7 +82,7 @@ class AddIssue(QWidget):
         self.rootCauseActionPartyEntry.setEditable(True)
         self.addRootCauseBtn = QPushButton("Add root cause")
 
-        self.submitObservationBtn = QPushButton("Submit observation")
+        self.submitObservationBtn = QPushButton("Add issue")
         self.submitObservationBtn.clicked.connect(self.addIssue)
 
     def layouts(self):

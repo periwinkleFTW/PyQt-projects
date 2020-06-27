@@ -12,6 +12,7 @@ import backend
 db = backend.Database("simplereport-data.db")
 
 
+
 class Main(QMainWindow):
     def __init__(self):
         QMainWindow.__init__(self)
@@ -19,6 +20,8 @@ class Main(QMainWindow):
         self.setWindowIcon(QIcon("assets/icons/logo-dark.png"))
         self.setGeometry(150, 150, 1470, 750)
         # self.setFixedSize(self.size())
+
+        self.populateDummyData()
 
         self.UI()
         self.show()
@@ -42,7 +45,7 @@ class Main(QMainWindow):
         self.tabs.addTab(self.tab1, "Issues")
         self.tabs.addTab(self.tab2, "People")
         self.tabs.addTab(self.tab3, "Facilities")
-        # self.tabs.addTab(self.tab4, "Statisticss")
+        # self.tabs.addTab(self.tab4, "Statistics")
 
     def widgets(self):
         # Tab 1 (Issues) widgets ###########################################################
@@ -54,7 +57,7 @@ class Main(QMainWindow):
 
         # Middle layout (list issues) widgets with radio buttons
         self.allIssuesRadioBtn = QRadioButton("All issues")
-        self.ongoingIssuesRadioBtn = QRadioButton("Ongoing issues")
+        self.ongoingIssuesRadioBtn = QRadioButton("Pending issues")
         self.lateIssuesRadioBtn = QRadioButton("Late issues")
         self.closedIssuesRadioBtn = QRadioButton("Closed issues")
         self.listIssuesBtn = QPushButton("List issues")
@@ -719,7 +722,57 @@ class Main(QMainWindow):
         self.displayFacility.close()
 
 
+    def populateDummyData(self):
+        queryIssues = "INSERT INTO issues (" \
+                      "issue_date, issue_priority, issue_observer, issue_team," \
+                      "issue_inspection, issue_theme, issue_facility, issue_fac_supervisor," \
+                      "issue_spec_loc, issue_insp_dept, issue_insp_contr, issue_insp_subcontr," \
+                      "issue_deadline, status, created_on, closed_on)" \
+                      "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)" \
 
+
+        queryPeople = "INSERT INTO people (person_first_name, person_last_name, person_title, person_phone," \
+                      "person_email, person_location, person_empl_type) VALUES (?, ?, ?, ?, ?, ?, ?)"
+
+        queryFacility = "INSERT INTO facilities (facility_name, facility_location, facility_phone, " \
+                        "facility_email, facility_supervisor)" \
+                        "VALUES (?, ?, ?, ?, ?)"
+
+        issue1 = ['2020-06-26 19:39', 'Low', 'John Doe', 'Team1',
+                  'Internal audit', 'General safety', 'Facility1',
+                  'Miranda Brown', 'North staircase', 'Mech Engineering',
+                  '', '', '2020-07-26 12:00', 'Open', '2020-06-30 19:39', '']
+
+        issue2 = ('2020-06-23 10:30', 'High', 'John Doe', 'Team1',
+                  'Safety inspection', 'General safety', 'Facility1',
+                  'Miranda Brown', 'North staircase', 'Mech Engineering',
+                  '', '', '2020-09-25 12:00', 'Open', '2020-06-24 14:25', '')
+
+        issue3 = ('2020-06-26 19:39', 'Critical', 'John Doe', 'Team1',
+                  'Investigation', 'General safety', 'Facility1',
+                  'Miranda Brown', 'North staircase', 'Mech Engineering',
+                  '', '', '2020-07-26 12:00', 'Closed', '2020-06-28 19:39', '')
+
+        person1 = ('John', 'Doe', 'Safety officer', '355-234-3234', 'johnd@gmail.com', 'Calgary', 'Employee')
+        person2 = ('Miranda', 'Brown', 'Safety officer', '332-432-6564', 'mirandab@gmail.com', 'Calgary', 'Contractor')
+        person3 = ('Philip J.', 'Fry', 'Delivery boy', '233-543-6432', 'fryme@gmail.com', 'New New York', 'Subcontractor')
+
+        facility1 = ('Refinery', 'Richmond', '255-323-5456', 'refinery1@company.ca', 'Miranda Brown')
+        facility2 = ('Main office', 'Victoria', '778-544-9056', 'hq@company.ca', 'Tom Riddle')
+        facility3 = ('Factory', 'Quebec', '656-323-6767', 'factory1@company.ca', 'John Wick')
+
+        print("Before queries")
+        db.cur.execute(queryIssues, issue1)
+        db.cur.execute(queryIssues, issue2)
+        db.cur.execute(queryIssues, issue3)
+        #
+        db.cur.execute(queryPeople, person1)
+        db.cur.execute(queryPeople, person2)
+        db.cur.execute(queryPeople, person3)
+        #
+        db.cur.execute(queryFacility, facility1)
+        db.cur.execute(queryFacility, facility2)
+        db.cur.execute(queryFacility, facility3)
 
 # class DisplayIssue(QWidget):
 #     def __init__(self):
