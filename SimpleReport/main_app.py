@@ -16,7 +16,7 @@ class Main(QMainWindow):
     def __init__(self):
         QMainWindow.__init__(self)
         self.setWindowTitle("SimpleReport")
-        # self.setWindowIcon(QIcon("assets/icons/logo-dark.png"))
+        self.setWindowIcon(QIcon("assets/icons/logo-dark.png"))
         self.setGeometry(150, 150, 1470, 750)
         # self.setFixedSize(self.size())
 

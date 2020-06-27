@@ -154,21 +154,6 @@ class DisplayIssue(QWidget):
         status_ = self.statusEntry.currentText()
         deadline = self.deadlineEntry.text()
 
-        print(date)
-        print(priority)
-        print(observer)
-        print(revTeam)
-        print(inspectionName)
-        print(theme)
-        print(facility)
-        print(facilitySupervisor)
-        print(specLocation)
-        print(inspDept)
-        print(inspContr)
-        print(inspSubcontr)
-        print(status_)
-        print(deadline)
-
         if (date and priority and observer and revTeam and inspectionName and theme and facility
                 and facilitySupervisor and specLocation and inspDept and deadline != ""):
             try:

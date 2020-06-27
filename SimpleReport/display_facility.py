@@ -64,7 +64,9 @@ class DisplayFacility(QWidget):
         self.supervisorEntry = QLineEdit()
         self.supervisorEntry.setText(self.supervisor)
         self.updateBtn = QPushButton("Update")
+        self.updateBtn.clicked.connect(self.updateFacility)
         self.deleteBtn = QPushButton("Delete")
+        self.deleteBtn.clicked.connect(self.Parent.funcDeleteFacility)
 
     def layouts(self):
         self.mainLayout = QVBoxLayout()
@@ -92,3 +94,28 @@ class DisplayFacility(QWidget):
         self.mainLayout.addWidget(self.bottomFrame)
 
         self.setLayout(self.mainLayout)
+
+    def updateFacility(self):
+        row = self.Parent.facilitiesTable.currentRow()
+        facilityId = self.Parent.facilitiesTable.item(row, 0).text()
+
+        name = self.nameEntry.text()
+        location = self.locationEntry.text()
+        phone = self.phoneEntry.text()
+        email = self.emailEntry.text()
+        supervisor = self.supervisorEntry.text()
+
+        if (name and location and phone and email and supervisor != ""):
+            try:
+                query = "UPDATE facilities SET facility_name=?, facility_location=?, facility_phone=?," \
+                        "facility_email=?, facility_supervisor=? WHERE facility_id=?"
+                db.cur.execute(query, (name, location, phone, email, supervisor, facilityId))
+                db.conn.commit()
+                QMessageBox.information(self, "Info", "Facility info updated")
+            except:
+                QMessageBox.information(self, "Info", "No changes made")
+        else:
+            QMessageBox.information(self, "Info", "Fields cannot be empty")
+
+        self.Parent.displayFacilities()
+        self.close()
