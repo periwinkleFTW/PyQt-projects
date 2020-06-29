@@ -1,9 +1,11 @@
 import sys, os
-from PySide2.QtWidgets import *
-from PySide2.QtGui import *
-from PySide2.QtCore import *
+
+from PySide2.QtWidgets import QApplication, QMainWindow, QTabWidget, QWidget, QLabel, QLineEdit, QPushButton, \
+    QRadioButton, QTableWidget, QTableWidgetItem, QVBoxLayout, QHBoxLayout, \
+    QGroupBox, QTableView, QAbstractItemView, QMessageBox, QHeaderView
+from PySide2.QtGui import QIcon
+
 import sqlite3
-from PIL import Image
 import add_issue, display_issue
 import add_person, display_person
 import add_facility, display_facility
@@ -21,7 +23,7 @@ class Main(QMainWindow):
         self.setGeometry(150, 150, 1470, 750)
         # self.setFixedSize(self.size())
 
-        self.populateDummyData()
+        #self.populateDummyData()
 
         self.UI()
         self.show()
@@ -54,6 +56,7 @@ class Main(QMainWindow):
         self.searchIssuesEntry = QLineEdit()
         self.searchIssuesEntry.setPlaceholderText("Search issues..")
         self.searchIssuesBtn = QPushButton("Search")
+        self.searchIssuesBtn.clicked.connect(self.searchIssues)
 
         # Middle layout (list issues) widgets with radio buttons
         self.allIssuesRadioBtn = QRadioButton("All issues")
@@ -452,7 +455,7 @@ class Main(QMainWindow):
                     "OR issue_priority LIKE ?" \
                     "OR issue_observer LIKE ?" \
                     "OR issue_team LIKE ?" \
-                    "OR issue_inspector LIKE ?" \
+                    "OR issue_inspection LIKE ?" \
                     "OR issue_theme LIKE ?" \
                     "OR issue_facility LIKE ?" \
                     "OR issue_fac_supervisor LIKE ?" \
@@ -460,7 +463,7 @@ class Main(QMainWindow):
                     "OR issue_insp_dept LIKE ?" \
                     "OR issue_insp_contr LIKE ?" \
                     "OR issue_insp_subcontr LIKE ?" \
-                    "OR issue_dealine LIKE ?"
+                    "OR issue_deadline LIKE ?"
             results = db.cur.execute(query, ('%'+value+'%', '%'+value+'%', '%'+value+'%', '%'+value+'%',
                                              '%'+value+'%', '%'+value+'%', '%'+value+'%', '%'+value+'%',
                                              '%'+value+'%', '%'+value+'%', '%'+value+'%', '%'+value+'%',
@@ -625,7 +628,6 @@ class Main(QMainWindow):
 
 
     def funcCloseIssue(self):
-        #global issueId
         row = self.issuesTable.currentRow()
         issueId = int(self.issuesTable.item(row, 0).text())
 
@@ -696,7 +698,7 @@ class Main(QMainWindow):
             except:
                 QMessageBox.information(self, "Info", "No changes made")
 
-        self.displayPerson.close()
+        self.selectedIssue.close()
 
 
 
@@ -722,345 +724,57 @@ class Main(QMainWindow):
         self.displayFacility.close()
 
 
-    def populateDummyData(self):
-        queryIssues = "INSERT INTO issues (" \
-                      "issue_date, issue_priority, issue_observer, issue_team," \
-                      "issue_inspection, issue_theme, issue_facility, issue_fac_supervisor," \
-                      "issue_spec_loc, issue_insp_dept, issue_insp_contr, issue_insp_subcontr," \
-                      "issue_deadline, status, created_on, closed_on)" \
-                      "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)" \
-
-
-        queryPeople = "INSERT INTO people (person_first_name, person_last_name, person_title, person_phone," \
-                      "person_email, person_location, person_empl_type) VALUES (?, ?, ?, ?, ?, ?, ?)"
-
-        queryFacility = "INSERT INTO facilities (facility_name, facility_location, facility_phone, " \
-                        "facility_email, facility_supervisor)" \
-                        "VALUES (?, ?, ?, ?, ?)"
-
-        issue1 = ['2020-06-26 19:39', 'Low', 'John Doe', 'Team1',
-                  'Internal audit', 'General safety', 'Facility1',
-                  'Miranda Brown', 'North staircase', 'Mech Engineering',
-                  '', '', '2020-07-26 12:00', 'Open', '2020-06-30 19:39', '']
-
-        issue2 = ('2020-06-23 10:30', 'High', 'John Doe', 'Team1',
-                  'Safety inspection', 'General safety', 'Facility1',
-                  'Miranda Brown', 'North staircase', 'Mech Engineering',
-                  '', '', '2020-09-25 12:00', 'Open', '2020-06-24 14:25', '')
-
-        issue3 = ('2020-06-26 19:39', 'Critical', 'John Doe', 'Team1',
-                  'Investigation', 'General safety', 'Facility1',
-                  'Miranda Brown', 'North staircase', 'Mech Engineering',
-                  '', '', '2020-07-26 12:00', 'Closed', '2020-06-28 19:39', '')
-
-        person1 = ('John', 'Doe', 'Safety officer', '355-234-3234', 'johnd@gmail.com', 'Calgary', 'Employee')
-        person2 = ('Miranda', 'Brown', 'Safety officer', '332-432-6564', 'mirandab@gmail.com', 'Calgary', 'Contractor')
-        person3 = ('Philip J.', 'Fry', 'Delivery boy', '233-543-6432', 'fryme@gmail.com', 'New New York', 'Subcontractor')
-
-        facility1 = ('Refinery', 'Richmond', '255-323-5456', 'refinery1@company.ca', 'Miranda Brown')
-        facility2 = ('Main office', 'Victoria', '778-544-9056', 'hq@company.ca', 'Tom Riddle')
-        facility3 = ('Factory', 'Quebec', '656-323-6767', 'factory1@company.ca', 'John Wick')
-
-        print("Before queries")
-        db.cur.execute(queryIssues, issue1)
-        db.cur.execute(queryIssues, issue2)
-        db.cur.execute(queryIssues, issue3)
-        #
-        db.cur.execute(queryPeople, person1)
-        db.cur.execute(queryPeople, person2)
-        db.cur.execute(queryPeople, person3)
-        #
-        db.cur.execute(queryFacility, facility1)
-        db.cur.execute(queryFacility, facility2)
-        db.cur.execute(queryFacility, facility3)
-
-# class DisplayIssue(QWidget):
-#     def __init__(self):
-#         super().__init__()
-#         self.setWindowTitle("View issue")
-#         self.setWindowIcon(QIcon("assets/icons/logo-dark.png"))
-#         self.setGeometry(450, 150, 750, 650)
-#         self.UI()
-#         self.show()
-#
-#     def UI(self):
-#         self.issueDetails()
-#         self.widgets()
-#         self.layouts()
-#
-#     def issueDetails(self):
-#         global issueId
-#         # row = self.issuesTable.currentRow()
-#         # issueId = self.issuesTable.item(row, 0).text()
-#
-#         query = "SELECT * FROM issues WHERE issue_id=?"
-#
-#         cur = db.cur
-#         issue = cur.execute(query, (issueId,)).fetchone()
-#
-#         self.id = issue[0]
-#         self.date = issue[1]
-#         self.priority = issue[2]
-#         self.observer = issue[3]
-#         self.revTeam = issue[4]
-#         self.inspectorName = issue[5]
-#         self.theme = issue[6]
-#         self.facility = issue[7]
-#         self.facilitySupervisor = issue[8]
-#         self.specLocation = issue[9]
-#         self.inspectedDept = issue[10]
-#         self.inspectedContr = issue[11]
-#         self.inspectedSubcontr = issue[12]
-#         self.deadline = issue[13]
-#         self.status = issue[14]
-#
-#     def widgets(self):
-#         # Top layout widgets
-#         self.issueImg = QLabel()
-#         self.img = QPixmap('assets/icons/logo-dark.png')
-#         self.issueImg.setPixmap(self.img)
-#         self.issueImg.setAlignment(Qt.AlignCenter)
-#         self.titleText = QLabel("Display issue")
-#         self.titleText.setAlignment(Qt.AlignCenter)
-#         # Bottom layout widgets
-#         self.idEntry = QLabel(str(self.id))
-#         self.dateEntry = QLineEdit()
-#         self.dateEntry.setText(self.date)
-#         self.priorityEntry = QLineEdit()
-#         self.priorityEntry.setText(self.priority)
-#         self.observerEntry = QLineEdit()
-#         self.observerEntry.setText(self.observer)
-#         self.revTeamEntry = QLineEdit()
-#         self.revTeamEntry.setText(self.revTeam)
-#         self.inspectorNameEntry = QLineEdit()
-#         self.inspectorNameEntry.setText(self.inspectorName)
-#         self.themeEntry = QLineEdit()
-#         self.themeEntry.setText(self.theme)
-#         self.facilityEntry = QLineEdit()
-#         self.facilityEntry.setText(self.facility)
-#         self.facilitySupervisorEntry = QLineEdit()
-#         self.facilitySupervisorEntry.setText(self.facilitySupervisor)
-#         self.specLocationEntry = QLineEdit()
-#         self.specLocationEntry.setText(self.specLocation)
-#         self.inspectedDeptEntry = QLineEdit()
-#         self.inspectedDeptEntry.setText(self.inspectedDept)
-#         self.inspectedContrEntry = QLineEdit()
-#         self.inspectedContrEntry.setText(self.inspectedContr)
-#         self.inspectedSubcontrEntry = QLineEdit()
-#         self.inspectedSubcontrEntry.setText(self.inspectedSubcontr)
-#         self.deadlineEntry = QLineEdit()
-#         self.deadlineEntry.setText(self.deadline)
-#
-#         statusList = ["Open", "Closed"]
-#         self.statusEntry = QComboBox()
-#         self.statusEntry.addItems(statusList)
-#
-#         self.updateBtn = QPushButton("Update")
-#         self.deleteBtn = QPushButton("Delete")
-#
-#     def layouts(self):
-#         self.mainLayout = QVBoxLayout()
-#         self.topLayout = QVBoxLayout()
-#         self.bottomLayout = QFormLayout()
-#         self.topFrame = QFrame()
-#         self.bottomFrame = QFrame()
-#
-#         # Add widgets
-#         self.topLayout.addWidget(self.titleText)
-#         self.topLayout.addWidget(self.issueImg)
-#         self.topFrame.setLayout(self.topLayout)
-#
-#         self.bottomLayout.addRow("ID: ", self.idEntry)
-#         self.bottomLayout.addRow("Date: ", self.dateEntry)
-#         self.bottomLayout.addRow("Priority: ", self.priorityEntry)
-#         self.bottomLayout.addRow("Observer: ", self.observerEntry)
-#         self.bottomLayout.addRow("Revision Team: ", self.revTeamEntry)
-#         self.bottomLayout.addRow("Inspector name: ", self.inspectorNameEntry)
-#         self.bottomLayout.addRow("HSE theme: ", self.themeEntry)
-#         self.bottomLayout.addRow("Facility: ", self.facilityEntry)
-#         self.bottomLayout.addRow("Facility supervisor: ", self.facilitySupervisorEntry)
-#         self.bottomLayout.addRow("Specific location: ", self.specLocationEntry)
-#         self.bottomLayout.addRow("Inspected department: ", self.inspectedDeptEntry)
-#         self.bottomLayout.addRow("Inspected contractor: ", self.inspectedContrEntry)
-#         self.bottomLayout.addRow("Inspected subcontractor: ", self.inspectedSubcontrEntry)
-#         self.bottomLayout.addRow("Deadline: ", self.deadlineEntry)
-#         self.bottomLayout.addRow("Status: ", self.statusEntry)
-#         self.bottomLayout.addRow("", self.updateBtn)
-#         self.bottomLayout.addRow("", self.deleteBtn)
-#         self.bottomFrame.setLayout(self.bottomLayout)
-#
-#         self.mainLayout.addWidget(self.topFrame)
-#         self.mainLayout.addWidget(self.bottomFrame)
-#
-#         self.setLayout(self.mainLayout)
-
-
-# class DisplayPerson(QWidget):
-#     def __init__(self):
-#         super().__init__()
-#         self.setWindowTitle("View person")
-#         self.setWindowIcon(QIcon("assets/icons/logo-dark.png"))
-#         self.setGeometry(450, 150, 750, 650)
-#         self.UI()
-#         self.show()
-#
-#     def UI(self):
-#         self.personDetails()
-#         self.widgets()
-#         self.layouts()
-#
-#     def personDetails(self):
-#         global personId
-#
-#         query = "SELECT * FROM people WHERE person_id=?"
-#
-#         cur = db.cur
-#         person = cur.execute(query, (personId,)).fetchone()
-#
-#         self.id = person[0]
-#         self.firstName = person[1]
-#         self.lastName = person[2]
-#         self.title = person[3]
-#         self.phone = person[4]
-#         self.email = person[5]
-#         self.location = person[6]
-#         self.emplType = person[7]
-#
-#     def widgets(self):
-#         # Top layout widgets
-#         self.personImg = QLabel()
-#         self.img = QPixmap('assets/icons/logo-dark.png')
-#         self.personImg.setPixmap(self.img)
-#         self.personImg.setAlignment(Qt.AlignCenter)
-#         self.titleText = QLabel("Display person")
-#         self.titleText.setAlignment(Qt.AlignCenter)
-#         # Bottom layout widgets
-#         self.idEntry = QLabel(str(self.id))
-#         self.firstNameEntry = QLineEdit()
-#         self.firstNameEntry.setText(self.firstName)
-#         self.lastNameEntry = QLineEdit()
-#         self.lastNameEntry.setText(self.lastName)
-#         self.titleEntry = QLineEdit()
-#         self.titleEntry.setText(self.title)
-#         self.phoneEntry = QLineEdit()
-#         self.phoneEntry.setText(self.phone)
-#         self.emailEntry = QLineEdit()
-#         self.emailEntry.setText(self.email)
-#         self.locationEntry = QLineEdit()
-#         self.locationEntry.setText(self.location)
-#         self.emplTypeEntry = QLineEdit()
-#         self.emplTypeEntry.setText(self.emplType)
-#         self.updateBtn = QPushButton("Update")
-#         self.deleteBtn = QPushButton("Delete")
-#
-#     def layouts(self):
-#         self.mainLayout = QVBoxLayout()
-#         self.topLayout = QVBoxLayout()
-#         self.bottomLayout = QFormLayout()
-#         self.topFrame = QFrame()
-#         self.bottomFrame = QFrame()
-#
-#         # Add widgets
-#         self.topLayout.addWidget(self.titleText)
-#         self.topLayout.addWidget(self.personImg)
-#         self.topFrame.setLayout(self.topLayout)
-#
-#         self.bottomLayout.addRow("ID: ", self.idEntry)
-#         self.bottomLayout.addRow("First name: ", self.firstNameEntry)
-#         self.bottomLayout.addRow("Last name: ", self.lastNameEntry)
-#         self.bottomLayout.addRow("Title: ", self.titleEntry)
-#         self.bottomLayout.addRow("Phone: ", self.phoneEntry)
-#         self.bottomLayout.addRow("Email: ", self.emailEntry)
-#         self.bottomLayout.addRow("Location: ", self.locationEntry)
-#         self.bottomLayout.addRow("Employment type: ", self.emplTypeEntry)
-#         self.bottomLayout.addRow("", self.updateBtn)
-#         self.bottomLayout.addRow("", self.deleteBtn)
-#         self.bottomFrame.setLayout(self.bottomLayout)
-#
-#         self.mainLayout.addWidget(self.topFrame)
-#         self.mainLayout.addWidget(self.bottomFrame)
-#
-#         self.setLayout(self.mainLayout)
-
-
-# class DisplayFacility(QWidget):
-#     def __init__(self):
-#         super().__init__()
-#         self.setWindowTitle("View facility")
-#         self.setWindowIcon(QIcon("assets/icons/logo-dark.png"))
-#         self.setGeometry(450, 150, 750, 650)
-#         self.UI()
-#         self.show()
-#
-#     def UI(self):
-#         self.facilityDetails()
-#         self.widgets()
-#         self.layouts()
-#
-#     def facilityDetails(self):
-#         global facilityId
-#
-#         query = "SELECT * FROM facilities WHERE facility_id=?"
-#
-#         cur = db.cur
-#         facility = cur.execute(query, (facilityId,)).fetchone()
-#
-#         self.id = facility[0]
-#         self.name = facility[1]
-#         self.location = facility[2]
-#         self.phone = facility[3]
-#         self.email = facility[4]
-#         self.supervisor = facility[5]
-#
-#     def widgets(self):
-#         # Top layout widgets
-#         self.facilityImg = QLabel()
-#         self.img = QPixmap('assets/icons/logo-dark.png')
-#         self.facilityImg.setPixmap(self.img)
-#         self.facilityImg.setAlignment(Qt.AlignCenter)
-#         self.titleText = QLabel("Display facility")
-#         self.titleText.setAlignment(Qt.AlignCenter)
-#         # Bottom layout widgets
-#         self.idEntry = QLabel(str(self.id))
-#         self.nameEntry = QLineEdit()
-#         self.nameEntry.setText(self.name)
-#         self.locationEntry = QLineEdit()
-#         self.locationEntry.setText(self.location)
-#         self.phoneEntry = QLineEdit()
-#         self.phoneEntry.setText(self.phone)
-#         self.emailEntry = QLineEdit()
-#         self.emailEntry.setText(self.email)
-#         self.supervisorEntry = QLineEdit()
-#         self.supervisorEntry.setText(self.supervisor)
-#         self.updateBtn = QPushButton("Update")
-#         self.deleteBtn = QPushButton("Delete")
-#
-#     def layouts(self):
-#         self.mainLayout = QVBoxLayout()
-#         self.topLayout = QVBoxLayout()
-#         self.bottomLayout = QFormLayout()
-#         self.topFrame = QFrame()
-#         self.bottomFrame = QFrame()
-#
-#         # Add widgets
-#         self.topLayout.addWidget(self.titleText)
-#         self.topLayout.addWidget(self.facilityImg)
-#         self.topFrame.setLayout(self.topLayout)
-#
-#         self.bottomLayout.addRow("ID: ", self.idEntry)
-#         self.bottomLayout.addRow("First name: ", self.nameEntry)
-#         self.bottomLayout.addRow("Last name: ", self.locationEntry)
-#         self.bottomLayout.addRow("Title: ", self.phoneEntry)
-#         self.bottomLayout.addRow("Phone: ", self.emailEntry)
-#         self.bottomLayout.addRow("Email: ", self.supervisorEntry)
-#         self.bottomLayout.addRow("", self.updateBtn)
-#         self.bottomLayout.addRow("", self.deleteBtn)
-#         self.bottomFrame.setLayout(self.bottomLayout)
-#
-#         self.mainLayout.addWidget(self.topFrame)
-#         self.mainLayout.addWidget(self.bottomFrame)
-#
-#         self.setLayout(self.mainLayout)
+    # def populateDummyData(self):
+    #     queryIssues = "INSERT INTO issues (" \
+    #                   "issue_date, issue_priority, issue_observer, issue_team," \
+    #                   "issue_inspection, issue_theme, issue_facility, issue_fac_supervisor," \
+    #                   "issue_spec_loc, issue_insp_dept, issue_insp_contr, issue_insp_subcontr," \
+    #                   "issue_deadline, status, created_on, closed_on)" \
+    #                   "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)" \
+    #
+    #
+    #     queryPeople = "INSERT INTO people (person_first_name, person_last_name, person_title, person_phone," \
+    #                   "person_email, person_location, person_empl_type) VALUES (?, ?, ?, ?, ?, ?, ?)"
+    #
+    #     queryFacility = "INSERT INTO facilities (facility_name, facility_location, facility_phone, " \
+    #                     "facility_email, facility_supervisor)" \
+    #                     "VALUES (?, ?, ?, ?, ?)"
+    #
+    #     issue1 = ['2020-06-26 19:39', 'Low', 'John Doe', 'Team1',
+    #               'Internal audit', 'General safety', 'Facility1',
+    #               'Miranda Brown', 'North staircase', 'Mech Engineering',
+    #               '', '', '2020-07-26 12:00', 'Open', '2020-06-30 19:39', '']
+    #
+    #     issue2 = ('2020-06-23 10:30', 'High', 'John Doe', 'Team1',
+    #               'Safety inspection', 'General safety', 'Facility1',
+    #               'Miranda Brown', 'North staircase', 'Mech Engineering',
+    #               '', '', '2020-09-25 12:00', 'Open', '2020-06-24 14:25', '')
+    #
+    #     issue3 = ('2020-06-26 19:39', 'Critical', 'John Doe', 'Team1',
+    #               'Investigation', 'General safety', 'Facility1',
+    #               'Miranda Brown', 'North staircase', 'Mech Engineering',
+    #               '', '', '2020-07-26 12:00', 'Closed', '2020-06-28 19:39', '')
+    #
+    #     person1 = ('John', 'Doe', 'Safety officer', '355-234-3234', 'johnd@gmail.com', 'Calgary', 'Employee')
+    #     person2 = ('Miranda', 'Brown', 'Safety officer', '332-432-6564', 'mirandab@gmail.com', 'Calgary', 'Contractor')
+    #     person3 = ('Philip J.', 'Fry', 'Delivery boy', '233-543-6432', 'fryme@gmail.com', 'New New York', 'Subcontractor')
+    #
+    #     facility1 = ('Refinery', 'Richmond', '255-323-5456', 'refinery1@company.ca', 'Miranda Brown')
+    #     facility2 = ('Main office', 'Victoria', '778-544-9056', 'hq@company.ca', 'Tom Riddle')
+    #     facility3 = ('Factory', 'Quebec', '656-323-6767', 'factory1@company.ca', 'John Wick')
+    #
+    #     print("Before queries")
+    #     db.cur.execute(queryIssues, issue1)
+    #     db.cur.execute(queryIssues, issue2)
+    #     db.cur.execute(queryIssues, issue3)
+    #     #
+    #     db.cur.execute(queryPeople, person1)
+    #     db.cur.execute(queryPeople, person2)
+    #     db.cur.execute(queryPeople, person3)
+    #     #
+    #     db.cur.execute(queryFacility, facility1)
+    #     db.cur.execute(queryFacility, facility2)
+    #     db.cur.execute(queryFacility, facility3)
 
 
 def main():

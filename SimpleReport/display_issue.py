@@ -1,7 +1,7 @@
-from PySide2.QtWidgets import *
-from PySide2.QtGui import *
-from PySide2.QtCore import *
-import sqlite3
+from PySide2.QtWidgets import QWidget, QLabel, QLineEdit, QPushButton, QVBoxLayout, QComboBox, QFrame, \
+    QFormLayout, QMessageBox
+from PySide2.QtGui import QPixmap, QIcon
+from PySide2.QtCore import Qt
 
 import backend
 
@@ -161,13 +161,12 @@ class DisplayIssue(QWidget):
                         "issue_inspection=?, issue_theme=?, issue_facility=?, issue_fac_supervisor=?," \
                         "issue_spec_loc=?, issue_insp_dept=?, issue_insp_contr=?, issue_insp_subcontr=?," \
                         "issue_deadline=?, status=? WHERE issue_id=? "
-                print(issueId)
-                print("Before exec")
+
                 db.cur.execute(query, (date, priority, observer, revTeam, inspectionName, theme, facility,
                                        facilitySupervisor, specLocation, inspDept, inspContr, inspSubcontr,
                                        deadline, status_, issueId))
                 db.conn.commit()
-                print("After commit")
+
                 QMessageBox.information(self, "Info", "Issue info updated")
             except:
                 QMessageBox.information(self, "Info", "No changes made")

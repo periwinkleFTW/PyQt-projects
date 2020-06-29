@@ -1,9 +1,9 @@
 import sys, os
-from PySide2.QtWidgets import *
-from PySide2.QtGui import *
-from PySide2.QtCore import *
-import sqlite3
-from PIL import Image
+from PySide2.QtWidgets import QWidget, QLabel, QLineEdit, QPushButton, QVBoxLayout, QHBoxLayout, QFrame, \
+    QFormLayout, QMessageBox
+from PySide2.QtGui import QPixmap, QIcon
+from PySide2.QtCore import Qt
+
 
 import backend
 

@@ -1,11 +1,9 @@
-import sys, os
-from PySide2.QtWidgets import *
-from PySide2.QtGui import *
-from PySide2.QtCore import *
-import sqlite3
-from PIL import Image
 
-import datetime
+from PySide2.QtWidgets import QWidget, QScrollArea, QLabel, QDateTimeEdit, QComboBox, QTextEdit, QPushButton,\
+    QVBoxLayout, QHBoxLayout, QFormLayout, QFrame, QMessageBox
+from PySide2.QtGui import QIcon, QPixmap, Qt
+from PySide2.QtCore import QDateTime
+
 
 import backend
 

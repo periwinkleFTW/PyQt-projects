@@ -1,12 +1,11 @@
 import sys, os
-from PySide2.QtWidgets import *
-from PySide2.QtGui import *
-from PySide2.QtCore import *
-import sqlite3
-from PIL import Image
+from PySide2.QtWidgets import QWidget, QLabel, QLineEdit, QPushButton, QVBoxLayout, QHBoxLayout, QComboBox, \
+    QFrame, QFormLayout, QMessageBox
+from PySide2.QtGui import QIcon, QPixmap
+from PySide2.QtCore import Qt
 
 import backend
-import main_app
+
 
 db = backend.Database("simplereport-data.db")
 

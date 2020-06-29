@@ -1,7 +1,6 @@
-from PySide2.QtWidgets import *
-from PySide2.QtGui import *
-from PySide2.QtCore import *
-import sqlite3
+from PySide2.QtWidgets import QWidget, QLabel, QLineEdit, QPushButton, QVBoxLayout, QFrame, QFormLayout, QMessageBox
+from PySide2.QtGui import QIcon, QPixmap
+from PySide2.QtCore import Qt
 
 import backend
 
