@@ -2,8 +2,9 @@ import sys, os
 
 from PySide2.QtWidgets import QApplication, QMainWindow, QTabWidget, QWidget, QLabel, QLineEdit, QPushButton, \
     QRadioButton, QTableWidget, QTableWidgetItem, QVBoxLayout, QHBoxLayout, \
-    QGroupBox, QTableView, QAbstractItemView, QMessageBox, QHeaderView
+    QGroupBox, QTableView, QAbstractItemView, QMessageBox, QHeaderView, QCheckBox
 from PySide2.QtGui import QIcon
+from PySide2.QtCore import Qt
 
 import sqlite3
 import add_issue, display_issue
@@ -14,7 +15,6 @@ import backend
 db = backend.Database("simplereport-data.db")
 
 
-
 class Main(QMainWindow):
     def __init__(self):
         QMainWindow.__init__(self)
@@ -23,7 +23,7 @@ class Main(QMainWindow):
         self.setGeometry(150, 150, 1470, 750)
         # self.setFixedSize(self.size())
 
-        #self.populateDummyData()
+        # self.populateDummyData()
 
         self.UI()
         self.show()
@@ -149,6 +149,8 @@ class Main(QMainWindow):
         self.viewPerson.clicked.connect(self.selectedPerson)
         self.deletePerson = QPushButton("Delete person")
         self.deletePerson.clicked.connect(self.funcDeletePerson)
+        self.exportPeopleBtn = QPushButton("Export")
+        self.exportPeopleBtn.clicked.connect(self.funcPeopleCheckBox)
 
         # Tab 3 (Facilities) widgets ###########################################################
         # Top layout (search facilities) widgets
@@ -304,7 +306,8 @@ class Main(QMainWindow):
         self.peopleBottomRightLayout.addWidget(self.addPerson, 5)
         self.peopleBottomRightLayout.addWidget(self.viewPerson, 5)
         self.peopleBottomRightLayout.addWidget(self.deletePerson, 5)
-        self.peopleBottomRightLayout.addWidget(self.peopleBottomRightGroupBoxFiller, 75)
+        self.peopleBottomRightLayout.addWidget(self.exportPeopleBtn, 5)
+        self.peopleBottomRightLayout.addWidget(self.peopleBottomRightGroupBoxFiller, 70)
         self.peopleBottomRightGroupBox.setLayout(self.peopleBottomRightLayout)
 
         self.peopleMainBottomLayout.addWidget(self.peopleBottomLeftGroupBox, 90)
@@ -405,11 +408,31 @@ class Main(QMainWindow):
         for row_data in people:
             row_number = self.peopleTable.rowCount()
             self.peopleTable.insertRow(row_number)
+            # Add checkboxes to the table
+            qwidget = QWidget()
+            checkbox = QCheckBox()
+            checkbox.setCheckState(Qt.Unchecked)
+            qhboxlayout = QHBoxLayout(qwidget)
+            qhboxlayout.addWidget(checkbox)
+            qhboxlayout.setAlignment(Qt.AlignCenter)
+            qhboxlayout.setContentsMargins(0, 0, 0, 0)
+            self.peopleTable.setCellWidget(row_number, 0, qwidget)
+            self.peopleTable.setItem(row_number, 1, QTableWidgetItem(str(row_number)))
+
             for column_number, data in enumerate(row_data):
                 self.peopleTable.setItem(row_number, column_number, QTableWidgetItem(str(data)))
 
         self.peopleTable.setEditTriggers(QAbstractItemView.NoEditTriggers)
         self.peopleTable.setSelectionBehavior(QTableView.SelectRows)
+
+    def funcPeopleCheckBox(self):
+        checked_list = []
+        for i in range(self.peopleTable.rowCount()):
+            if self.peopleTable.cellWidget(i, 0).findChild(type(QCheckBox())).isChecked():
+                checked_list.append(self.peopleTable.item(i, 0).text())
+        print (checked_list)
+
+
 
     def displayFacilities(self):
         for i in reversed(range(self.facilitiesTable.rowCount())):
@@ -464,10 +487,10 @@ class Main(QMainWindow):
                     "OR issue_insp_contr LIKE ?" \
                     "OR issue_insp_subcontr LIKE ?" \
                     "OR issue_deadline LIKE ?"
-            results = db.cur.execute(query, ('%'+value+'%', '%'+value+'%', '%'+value+'%', '%'+value+'%',
-                                             '%'+value+'%', '%'+value+'%', '%'+value+'%', '%'+value+'%',
-                                             '%'+value+'%', '%'+value+'%', '%'+value+'%', '%'+value+'%',
-                                             '%'+value+'%', '%'+value+'%', )).fetchall()
+            results = db.cur.execute(query, ('%' + value + '%', '%' + value + '%', '%' + value + '%', '%' + value + '%',
+                                             '%' + value + '%', '%' + value + '%', '%' + value + '%', '%' + value + '%',
+                                             '%' + value + '%', '%' + value + '%', '%' + value + '%', '%' + value + '%',
+                                             '%' + value + '%', '%' + value + '%',)).fetchall()
             if results == []:
                 QMessageBox.information(self, "Info", "Nothing was found")
                 self.displayIssues()
@@ -626,13 +649,11 @@ class Main(QMainWindow):
                 for column_number, data in enumerate(row_data):
                     self.peopleTable.setItem(row_number, column_number, QTableWidgetItem(str(data)))
 
-
     def funcCloseIssue(self):
         row = self.issuesTable.currentRow()
         issueId = int(self.issuesTable.item(row, 0).text())
 
         print(issueId, type(issueId))
-
 
         try:
             statusQuery = "SELECT status FROM issues WHERE issue_id=?"
@@ -678,7 +699,6 @@ class Main(QMainWindow):
 
         self.displayIssue.close()
 
-
     def funcDeletePerson(self):
         row = self.peopleTable.currentRow()
         personId = self.peopleTable.item(row, 0).text()
@@ -700,8 +720,6 @@ class Main(QMainWindow):
 
         self.selectedIssue.close()
 
-
-
     def funcDeleteFacility(self):
         row = self.facilitiesTable.currentRow()
         facilityId = self.facilitiesTable.item(row, 0).text()
@@ -722,7 +740,6 @@ class Main(QMainWindow):
                 QMessageBox.information(self, "Info", "No changes made")
 
         self.displayFacility.close()
-
 
     # def populateDummyData(self):
     #     queryIssues = "INSERT INTO issues (" \
