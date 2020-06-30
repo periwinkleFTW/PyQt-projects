@@ -102,6 +102,8 @@ class Main(QMainWindow):
         self.closeIssueBtn.clicked.connect(self.funcCloseIssue)
         self.deleteIssue = QPushButton("Delete issue")
         self.deleteIssue.clicked.connect(self.funcDeleteIssue)
+        self.exportIssueseBtn = QPushButton("Export")
+        self.exportIssueseBtn.clicked.connect(self.funcIssuesCheckBox)
 
         # Tab 2 (People) widgets ###########################################################
         # Top layout (search people) widgets
@@ -197,6 +199,8 @@ class Main(QMainWindow):
         self.viewFacility.clicked.connect(self.selectedFacility)
         self.deleteFacility = QPushButton("Delete facility")
         self.deleteFacility.clicked.connect(self.funcDeleteFacility)
+        self.exportFacilitiesBtn = QPushButton("Export")
+        self.exportFacilitiesBtn.clicked.connect(self.funcFacilitiesCheckBox)
 
         # Tab 4 (Statistics) widgets ###########################################################
         self.totalIssuesLabel = QLabel()
@@ -251,7 +255,8 @@ class Main(QMainWindow):
         self.issuesBottomRightLayout.addWidget(self.viewIssue, 5)
         self.issuesBottomRightLayout.addWidget(self.closeIssueBtn, 5)
         self.issuesBottomRightLayout.addWidget(self.deleteIssue, 5)
-        self.issuesBottomRightLayout.addWidget(self.issuesBottomRightGroupBoxFiller, 75)
+        self.issuesBottomRightLayout.addWidget(self.exportIssueseBtn, 5)
+        self.issuesBottomRightLayout.addWidget(self.issuesBottomRightGroupBoxFiller, 70)
         self.issuesBottomRightGroupBox.setLayout(self.issuesBottomRightLayout)
 
         self.issuesMainBottomLayout.addWidget(self.issuesBottomLeftGroupBox, 90)
@@ -361,7 +366,8 @@ class Main(QMainWindow):
         self.facilitiesBottomRightLayout.addWidget(self.addFacility, 5)
         self.facilitiesBottomRightLayout.addWidget(self.viewFacility, 5)
         self.facilitiesBottomRightLayout.addWidget(self.deleteFacility, 5)
-        self.facilitiesBottomRightLayout.addWidget(self.facilitiesBottomRightGroupBoxFiller, 75)
+        self.facilitiesBottomRightLayout.addWidget(self.exportFacilitiesBtn, 5)
+        self.facilitiesBottomRightLayout.addWidget(self.facilitiesBottomRightGroupBoxFiller, 70)
         self.facilitiesBottomRightGroupBox.setLayout(self.facilitiesBottomRightLayout)
 
         self.facilitiesMainBottomLayout.addWidget(self.facilitiesBottomLeftGroupBox, 90)
@@ -392,11 +398,33 @@ class Main(QMainWindow):
         for row_data in issues:
             row_number = self.issuesTable.rowCount()
             self.issuesTable.insertRow(row_number)
+            # Add checkboxes to the table
+            qwidget = QWidget()
+            checkbox = QCheckBox()
+            checkbox.setCheckState(Qt.Unchecked)
+            qhboxlayout = QHBoxLayout(qwidget)
+            qhboxlayout.addWidget(checkbox)
+            qhboxlayout.setAlignment(Qt.AlignRight)
+            qhboxlayout.setContentsMargins(0, 0, 20, 0)
+            self.issuesTable.setCellWidget(row_number, 0, qwidget)
+            self.issuesTable.setItem(row_number, 1, QTableWidgetItem(str(row_number)))
+
             for column_number, data in enumerate(row_data):
-                self.issuesTable.setItem(row_number, column_number, QTableWidgetItem(str(data)))
+                if column_number == 0:
+                    self.issuesTable.setItem(row_number, column_number, QTableWidgetItem("ISS#" + str(data)))
+                else:
+                    self.issuesTable.setItem(row_number, column_number, QTableWidgetItem(str(data)))
 
         self.issuesTable.setEditTriggers(QAbstractItemView.NoEditTriggers)
         self.issuesTable.setSelectionBehavior(QTableView.SelectRows)
+
+    def funcIssuesCheckBox(self):
+        checked_list = []
+        for i in range(self.issuesTable.rowCount()):
+            if self.issuesTable.cellWidget(i, 0).findChild(type(QCheckBox())).isChecked():
+                item = self.issuesTable.item(i, 0).text()
+                checked_list.append(item.lstrip("ISS#"))
+        print (checked_list)
 
     def displayPeople(self):
         for i in reversed(range(self.peopleTable.rowCount())):
@@ -414,22 +442,27 @@ class Main(QMainWindow):
             checkbox.setCheckState(Qt.Unchecked)
             qhboxlayout = QHBoxLayout(qwidget)
             qhboxlayout.addWidget(checkbox)
-            qhboxlayout.setAlignment(Qt.AlignCenter)
-            qhboxlayout.setContentsMargins(0, 0, 0, 0)
+            qhboxlayout.setAlignment(Qt.AlignRight)
+            qhboxlayout.setContentsMargins(0, 0, 20, 0)
             self.peopleTable.setCellWidget(row_number, 0, qwidget)
             self.peopleTable.setItem(row_number, 1, QTableWidgetItem(str(row_number)))
 
             for column_number, data in enumerate(row_data):
-                self.peopleTable.setItem(row_number, column_number, QTableWidgetItem(str(data)))
+                if column_number == 0:
+                    self.peopleTable.setItem(row_number, column_number, QTableWidgetItem("PRN#" + str(data)))
+                else:
+                    self.peopleTable.setItem(row_number, column_number, QTableWidgetItem(str(data)))
 
         self.peopleTable.setEditTriggers(QAbstractItemView.NoEditTriggers)
         self.peopleTable.setSelectionBehavior(QTableView.SelectRows)
 
+    # This function gets the Id of the checked items
     def funcPeopleCheckBox(self):
         checked_list = []
         for i in range(self.peopleTable.rowCount()):
             if self.peopleTable.cellWidget(i, 0).findChild(type(QCheckBox())).isChecked():
-                checked_list.append(self.peopleTable.item(i, 0).text())
+                item = self.peopleTable.item(i, 0).text()
+                checked_list.append(item.lstrip("PRN#"))
         print (checked_list)
 
 
@@ -444,11 +477,34 @@ class Main(QMainWindow):
         for row_data in facilities:
             row_number = self.facilitiesTable.rowCount()
             self.facilitiesTable.insertRow(row_number)
+            # Add checkboxes to the table
+            qwidget = QWidget()
+            checkbox = QCheckBox()
+            checkbox.setCheckState(Qt.Unchecked)
+            qhboxlayout = QHBoxLayout(qwidget)
+            qhboxlayout.addWidget(checkbox)
+            qhboxlayout.setAlignment(Qt.AlignRight)
+            qhboxlayout.setContentsMargins(0, 0, 20, 0)
+            self.facilitiesTable.setCellWidget(row_number, 0, qwidget)
+            self.facilitiesTable.setItem(row_number, 1, QTableWidgetItem(str(row_number)))
+
             for column_number, data in enumerate(row_data):
-                self.facilitiesTable.setItem(row_number, column_number, QTableWidgetItem(str(data)))
+                if column_number == 0:
+                    self.facilitiesTable.setItem(row_number, column_number, QTableWidgetItem("FCL#" + str(data)))
+                else:
+                    self.facilitiesTable.setItem(row_number, column_number, QTableWidgetItem(str(data)))
 
         self.facilitiesTable.setEditTriggers(QAbstractItemView.NoEditTriggers)
         self.facilitiesTable.setSelectionBehavior(QTableView.SelectRows)
+
+    def funcFacilitiesCheckBox(self):
+        checked_list = []
+        for i in range(self.facilitiesTable.rowCount()):
+            if self.facilitiesTable.cellWidget(i, 0).findChild(type(QCheckBox())).isChecked():
+                item = self.facilitiesTable.item(i, 0).text()
+                checked_list.append(item.lstrip("FCL#"))
+        print (checked_list)
+
 
     # Selected items
     def selectedIssue(self):
