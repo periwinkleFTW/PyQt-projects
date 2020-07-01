@@ -5,7 +5,7 @@ from PySide2.QtCore import Qt
 
 import backend
 
-db = backend.Database("simplereport-data.db")
+db = backend.Database("sr-data.db")
 
 class DisplayPerson(QWidget):
     def __init__(self, parent):
@@ -28,10 +28,14 @@ class DisplayPerson(QWidget):
         row = self.Parent.peopleTable.currentRow()
         personId = self.Parent.peopleTable.item(row, 0).text()
 
+        # Adding prefixes to tables changed the format of the Id from and integer to a string PRN#+id
+        # Following code strips letters
+        personId = personId.lstrip("PRN#")
+
         query = "SELECT * FROM people WHERE person_id=?"
 
-        cur = db.cur
-        person = cur.execute(query, (personId,)).fetchone()
+        person = db.cur.execute(query, (personId,)).fetchone()
+        print(person)
 
         self.id = person[0]
         self.firstName = person[1]

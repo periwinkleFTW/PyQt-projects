@@ -5,7 +5,7 @@ from PySide2.QtCore import Qt
 
 import backend
 
-db = backend.Database("simplereport-data.db")
+db = backend.Database("sr-data.db")
 
 
 class DisplayIssue(QWidget):
@@ -29,6 +29,8 @@ class DisplayIssue(QWidget):
 
         row = self.Parent.issuesTable.currentRow()
         issueId = self.Parent.issuesTable.item(row, 0).text()
+        # Strip the ISS# from the id
+        issueId = issueId.lstrip("ISS#")
 
         query = "SELECT * FROM issues WHERE issue_id=?"
 

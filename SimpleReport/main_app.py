@@ -1,24 +1,25 @@
-import sys, os
+import sys, os, datetime
+import csv
 
 from PySide2.QtWidgets import QApplication, QMainWindow, QTabWidget, QWidget, QLabel, QLineEdit, QPushButton, \
     QRadioButton, QTableWidget, QTableWidgetItem, QVBoxLayout, QHBoxLayout, \
-    QGroupBox, QTableView, QAbstractItemView, QMessageBox, QHeaderView, QCheckBox
+    QGroupBox, QTableView, QAbstractItemView, QMessageBox, QHeaderView, QCheckBox, QAction, QFileDialog
 from PySide2.QtGui import QIcon
-from PySide2.QtCore import Qt
+from PySide2.QtCore import Qt, QFileInfo
+from PySide2.QtPrintSupport import QPrinter, QPrintPreviewDialog, QPrintDialog
 
-import sqlite3
 import add_issue, display_issue
 import add_person, display_person
 import add_facility, display_facility
 import backend
 
-db = backend.Database("simplereport-data.db")
+db = backend.Database("sr-data.db")
 
 
 class Main(QMainWindow):
     def __init__(self):
         QMainWindow.__init__(self)
-        self.setWindowTitle("SimpleReport")
+        self.setWindowTitle("SR")
         self.setWindowIcon(QIcon("assets/icons/logo-dark.png"))
         self.setGeometry(150, 150, 1470, 750)
         # self.setFixedSize(self.size())
@@ -424,7 +425,9 @@ class Main(QMainWindow):
             if self.issuesTable.cellWidget(i, 0).findChild(type(QCheckBox())).isChecked():
                 item = self.issuesTable.item(i, 0).text()
                 checked_list.append(item.lstrip("ISS#"))
-        print (checked_list)
+        indices = checked_list
+        self.funcIssuesToCSV(indices)
+
 
     def displayPeople(self):
         for i in reversed(range(self.peopleTable.rowCount())):
@@ -456,14 +459,14 @@ class Main(QMainWindow):
         self.peopleTable.setEditTriggers(QAbstractItemView.NoEditTriggers)
         self.peopleTable.setSelectionBehavior(QTableView.SelectRows)
 
-    # This function gets the Id of the checked items
     def funcPeopleCheckBox(self):
         checked_list = []
         for i in range(self.peopleTable.rowCount()):
             if self.peopleTable.cellWidget(i, 0).findChild(type(QCheckBox())).isChecked():
                 item = self.peopleTable.item(i, 0).text()
                 checked_list.append(item.lstrip("PRN#"))
-        print (checked_list)
+        indices = checked_list
+        self.funcPeopleToCSV(indices)
 
 
 
@@ -503,7 +506,9 @@ class Main(QMainWindow):
             if self.facilitiesTable.cellWidget(i, 0).findChild(type(QCheckBox())).isChecked():
                 item = self.facilitiesTable.item(i, 0).text()
                 checked_list.append(item.lstrip("FCL#"))
-        print (checked_list)
+        indices = checked_list
+        self.funcFacilitiesToCSV(indices)
+
 
 
     # Selected items
@@ -737,6 +742,7 @@ class Main(QMainWindow):
     def funcDeleteIssue(self):
         row = self.issuesTable.currentRow()
         issueId = self.issuesTable.item(row, 0).text()
+        issueId = issueId.lstrip("ISS#")
 
         mbox = QMessageBox.question(self, "Warning", "Are you sure you want to delete issue " + issueId + "?",
                                     QMessageBox.Yes | QMessageBox.Cancel, QMessageBox.Cancel)
@@ -758,6 +764,7 @@ class Main(QMainWindow):
     def funcDeletePerson(self):
         row = self.peopleTable.currentRow()
         personId = self.peopleTable.item(row, 0).text()
+        personId = personId.lstrip("PRN#")
 
         mbox = QMessageBox.question(self, "Warning", "Are you sure you want to delete this person?",
                                     QMessageBox.Yes | QMessageBox.Cancel, QMessageBox.Cancel)
@@ -774,11 +781,12 @@ class Main(QMainWindow):
             except:
                 QMessageBox.information(self, "Info", "No changes made")
 
-        self.selectedIssue.close()
+        self.displayPerson.close()
 
     def funcDeleteFacility(self):
         row = self.facilitiesTable.currentRow()
         facilityId = self.facilitiesTable.item(row, 0).text()
+        facilityId = facilityId.lstrip("FCL#")
 
         mbox = QMessageBox.question(self, "Warning", "Are you sure you want to delete this facility?",
                                     QMessageBox.Yes | QMessageBox.Cancel, QMessageBox.Cancel)
@@ -796,6 +804,87 @@ class Main(QMainWindow):
                 QMessageBox.information(self, "Info", "No changes made")
 
         self.displayFacility.close()
+
+    # Export to CSV
+    def funcPeopleToCSV(self, indices):
+        # Check if there are any selected items
+        if indices:
+            try:
+                date = datetime.datetime.now()
+
+                # Get file location and add timestamp to when it was created to the filename
+                fileName, _ = QFileDialog.getSaveFileName(self, "Save as...", "~/exportPplCSV"+"{:%d%b%Y %Hh%Mm}".format(date)+".csv", "CSV files (*.csv)")
+                if fileName:
+                    with open(fileName, "w") as csv_file:
+                        csv_writer = csv.writer(csv_file, delimiter="|")
+                        # The purpose of this statement is to set cursor to correct table, needs rework because inefficient
+                        db.cur.execute("SELECT * FROM people")
+                        # Get headers from the table
+                        csv_writer.writerow([i[0] for i in db.cur.description])
+                        for index in indices:
+                            query = "SELECT * FROM people WHERE person_id=?"
+                            person_record = db.cur.execute(query, (index,)).fetchone()
+                            csv_writer.writerow(person_record)
+
+                    QMessageBox.information(self, "Info", "Data exported successfully into {}".format(fileName))
+            except:
+                QMessageBox.information(self, "Info", "Export failed")
+        else:
+            QMessageBox.information(self, "Info", "Nothing selected for export\nUse checkboxes to select people to export")
+
+    def funcFacilitiesToCSV(self, indices):
+        # Check if there are any selected items
+        if indices:
+            try:
+                date = datetime.datetime.now()
+
+                # Get file location and add timestamp to when it was created to the filename
+                fileName, _ = QFileDialog.getSaveFileName(self, "Save as...", "~/exportFclCSV"+"{:%d%b%Y %Hh%Mm}".format(date)+".csv", "CSV files (*.csv)")
+                if fileName:
+                    with open(fileName, "w") as csv_file:
+                        csv_writer = csv.writer(csv_file, delimiter="|")
+                        # Setting cursor on the correct table
+                        db.cur.execute("SELECT * FROM facilities")
+                        # Get headers
+                        csv_writer.writerow([i[0] for i in db.cur.description])
+                        for index in indices:
+                            query = "SELECT * FROM facilities WHERE facility_id=?"
+                            facility_record = db.cur.execute(query, (index,)).fetchone()
+                            csv_writer.writerow(facility_record)
+
+                    QMessageBox.information(self, "Info", "Data exported successfully into {}".format(fileName))
+            except:
+                QMessageBox.information(self, "Info", "Export failed")
+        else:
+            QMessageBox.information(self, "Info", "Nothing selected for export\nUse checkboxes to select facilities to export")
+
+
+    def funcIssuesToCSV(self, indices):
+        # Check if there are any selected items
+        if indices:
+            try:
+                date = datetime.datetime.now()
+
+                # Get file location and add timestamp to when it was created to the filename
+                fileName, _ = QFileDialog.getSaveFileName(self, "Save as...", "~/exportIssCSV"+"{:%d%b%Y %Hh%Mm}".format(date)+".csv", "CSV files (*.csv)")
+                if fileName:
+                    with open(fileName, "w") as csv_file:
+                        csv_writer = csv.writer(csv_file, delimiter="|")
+                        # Setting cursor on the correct table
+                        db.cur.execute("SELECT * FROM issues")
+                        # Get headers
+                        csv_writer.writerow([i[0] for i in db.cur.description])
+                        for index in indices:
+                            query = "SELECT * FROM issues WHERE issue_id=?"
+                            facility_record = db.cur.execute(query, (index,)).fetchone()
+                            csv_writer.writerow(facility_record)
+
+                    QMessageBox.information(self, "Info", "Data exported successfully into {}".format(fileName))
+            except:
+                QMessageBox.information(self, "Info", "Export failed")
+        else:
+            QMessageBox.information(self, "Info", "Nothing selected for export\nUse checkboxes to select issues to export")
+
 
     # def populateDummyData(self):
     #     queryIssues = "INSERT INTO issues (" \

@@ -4,7 +4,7 @@ from PySide2.QtCore import Qt
 
 import backend
 
-db = backend.Database("simplereport-data.db")
+db = backend.Database("sr-data.db")
 
 
 
@@ -29,6 +29,8 @@ class DisplayFacility(QWidget):
 
         row = self.Parent.facilitiesTable.currentRow()
         facilityId = self.Parent.facilitiesTable.item(row, 0).text()
+        # Strip FCL# from the id
+        facilityId = facilityId.lstrip("FCL#")
 
         query = "SELECT * FROM facilities WHERE facility_id=?"
 

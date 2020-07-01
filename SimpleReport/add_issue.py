@@ -7,7 +7,7 @@ from PySide2.QtCore import QDateTime
 
 import backend
 
-db = backend.Database("simplereport-data.db")
+db = backend.Database("sr-data.db")
 
 defaultImg = "assets/icons/logo-dark.png"
 
@@ -146,7 +146,9 @@ class AddIssue(QWidget):
         inspectedSubcontr = self.inspectedSubcontractorEntry.currentText()
         deadline = self.deadlineEntry.text()
 
-        if date and deadline != "":
+        if date and priority and observer and revisionTeam and inspectionName and observationTheme and facility\
+                and facilitySupervisor and specificLocation and inspectedDept and inspectedContr \
+                and inspectedSubcontr and deadline != "":
             try:
                 query = "INSERT INTO issues (issue_date, issue_priority, issue_observer, issue_team," \
                         "issue_inspection, issue_theme, issue_facility, issue_fac_supervisor," \
@@ -164,10 +166,12 @@ class AddIssue(QWidget):
                 db.conn.commit()
 
                 QMessageBox.information(self, "Info", "Issue has been added")
+
+                self.Parent.displayIssues()
+                self.close()
             except:
                 QMessageBox.information(self, "Info", "Issue has not been added")
         else:
             QMessageBox.information(self, "Info", "Fields cannot be empty")
 
-        self.Parent.displayIssues()
-        self.close()
+

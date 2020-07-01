@@ -7,7 +7,7 @@ from PySide2.QtCore import Qt
 
 import backend
 
-db = backend.Database("simplereport-data.db")
+db = backend.Database("sr-data.db")
 
 defaultImg = "assets/icons/logo-dark.png"
 
@@ -94,7 +94,7 @@ class AddFacility(QWidget):
 
 
 
-        if (name and location != ""):
+        if (name and location and phone and email and supervisor != ""):
             try:
                 query = "INSERT INTO facilities (facility_name, facility_location, facility_phone, facility_email," \
                         "facility_supervisor) VALUES (?, ?, ?, ?, ?)"
@@ -102,13 +102,15 @@ class AddFacility(QWidget):
                 db.cur.execute(query, (name, location, phone, email, supervisor))
                 db.conn.commit()
                 QMessageBox.information(self, "Info", "Facility has been added")
+
+                self.Parent.displayFacilities()
+                self.close()
             except:
                 QMessageBox.information(self, "Info", "Facility has not been added")
         else:
             QMessageBox.information(self, "Info", "Fields cannot be empty")
 
-        self.Parent.displayFacilities()
-        self.close()
+
 
 
 
