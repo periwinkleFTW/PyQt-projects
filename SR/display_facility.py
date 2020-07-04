@@ -99,6 +99,7 @@ class DisplayFacility(QWidget):
     def updateFacility(self):
         row = self.Parent.facilitiesTable.currentRow()
         facilityId = self.Parent.facilitiesTable.item(row, 0).text()
+        facilityId = facilityId.lstrip("FCL#")
 
         name = self.nameEntry.text()
         location = self.locationEntry.text()

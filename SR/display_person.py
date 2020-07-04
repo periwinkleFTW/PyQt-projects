@@ -111,6 +111,7 @@ class DisplayPerson(QWidget):
     def updatePerson(self):
         row = self.Parent.peopleTable.currentRow()
         personId = self.Parent.peopleTable.item(row, 0).text()
+        personId = personId.lstrip("PRN#")
 
         firstName = self.firstNameEntry.text()
         lastName = self.lastNameEntry.text()

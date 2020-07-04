@@ -101,8 +101,10 @@ class Main(QMainWindow):
         self.closeIssueBtn.clicked.connect(self.funcCloseIssue)
         self.deleteIssue = QPushButton("Delete issue")
         self.deleteIssue.clicked.connect(self.funcDeleteIssue)
-        self.exportIssueseBtn = QPushButton("Export")
-        self.exportIssueseBtn.clicked.connect(self.funcIssuesCheckBox)
+        self.exportIssuesCSVBtn = QPushButton("Export CSV")
+        self.exportIssuesCSVBtn.clicked.connect(self.funcIssuesToCSV)
+        self.exportIssuesXLSXBtn = QPushButton("Export XLSX")
+        self.exportIssuesXLSXBtn.clicked.connect(self.funcIssuestoXLSX)
 
         # Tab 2 (People) widgets ###########################################################
         # Top layout (search people) widgets
@@ -150,8 +152,8 @@ class Main(QMainWindow):
         self.viewPerson.clicked.connect(self.selectedPerson)
         self.deletePerson = QPushButton("Delete person")
         self.deletePerson.clicked.connect(self.funcDeletePerson)
-        self.exportPeopleBtn = QPushButton("Export")
-        self.exportPeopleBtn.clicked.connect(self.funcPeopleCheckBox)
+        self.exportPeopleBtn = QPushButton("Export CSV")
+        self.exportPeopleBtn.clicked.connect(self.funcPeopleToCSV)
 
         # Tab 3 (Facilities) widgets ###########################################################
         # Top layout (search facilities) widgets
@@ -199,7 +201,7 @@ class Main(QMainWindow):
         self.deleteFacility = QPushButton("Delete facility")
         self.deleteFacility.clicked.connect(self.funcDeleteFacility)
         self.exportFacilitiesBtn = QPushButton("Export")
-        self.exportFacilitiesBtn.clicked.connect(self.funcFacilitiesCheckBox)
+        self.exportFacilitiesBtn.clicked.connect(self.funcFacilitiesToCSV)
 
         # Tab 4 (Statistics) widgets ###########################################################
         self.totalIssuesLabel = QLabel()
@@ -254,8 +256,9 @@ class Main(QMainWindow):
         self.issuesBottomRightLayout.addWidget(self.viewIssue, 5)
         self.issuesBottomRightLayout.addWidget(self.closeIssueBtn, 5)
         self.issuesBottomRightLayout.addWidget(self.deleteIssue, 5)
-        self.issuesBottomRightLayout.addWidget(self.exportIssueseBtn, 5)
-        self.issuesBottomRightLayout.addWidget(self.issuesBottomRightGroupBoxFiller, 70)
+        self.issuesBottomRightLayout.addWidget(self.exportIssuesCSVBtn, 5)
+        self.issuesBottomRightLayout.addWidget(self.exportIssuesXLSXBtn, 5)
+        self.issuesBottomRightLayout.addWidget(self.issuesBottomRightGroupBoxFiller, 65)
         self.issuesBottomRightGroupBox.setLayout(self.issuesBottomRightLayout)
 
         self.issuesMainBottomLayout.addWidget(self.issuesBottomLeftGroupBox, 90)
@@ -423,8 +426,7 @@ class Main(QMainWindow):
             if self.issuesTable.cellWidget(i, 0).findChild(type(QCheckBox())).isChecked():
                 item = self.issuesTable.item(i, 0).text()
                 checked_list.append(item.lstrip("ISS#"))
-        indices = checked_list
-        self.funcIssuesToCSV(indices)
+        return checked_list
 
     def displayPeople(self):
         for i in reversed(range(self.peopleTable.rowCount())):
@@ -462,8 +464,7 @@ class Main(QMainWindow):
             if self.peopleTable.cellWidget(i, 0).findChild(type(QCheckBox())).isChecked():
                 item = self.peopleTable.item(i, 0).text()
                 checked_list.append(item.lstrip("PRN#"))
-        indices = checked_list
-        self.funcPeopleToCSV(indices)
+        return checked_list
 
     def displayFacilities(self):
         for i in reversed(range(self.facilitiesTable.rowCount())):
@@ -501,8 +502,7 @@ class Main(QMainWindow):
             if self.facilitiesTable.cellWidget(i, 0).findChild(type(QCheckBox())).isChecked():
                 item = self.facilitiesTable.item(i, 0).text()
                 checked_list.append(item.lstrip("FCL#"))
-        indices = checked_list
-        self.funcFacilitiesToCSV(indices)
+        return checked_list
 
     # Selected items
     def selectedIssue(self):
@@ -705,7 +705,8 @@ class Main(QMainWindow):
 
     def funcCloseIssue(self):
         row = self.issuesTable.currentRow()
-        issueId = int(self.issuesTable.item(row, 0).text())
+        issueId = self.issuesTable.item(row, 0).text()
+        issueId = issueId.lstrip("ISS#")
 
         print(issueId, type(issueId))
 
@@ -799,7 +800,8 @@ class Main(QMainWindow):
         self.displayFacility.close()
 
     # Export to CSV
-    def funcIssuesToCSV(self, indices):
+    def funcIssuesToCSV(self):
+        indices = self.funcIssuesCheckBox()
         # Check if there are any selected items
         if indices:
             try:
@@ -807,7 +809,7 @@ class Main(QMainWindow):
 
                 # Get file location and add timestamp to when it was created to the filename
                 fileName, _ = QFileDialog.getSaveFileName(
-                    self, "Save as...", "~/exportIssCSV" + "{:%d%b%Y %Hh%Mm}".format(date) + ".csv",
+                    self, "Save as...", "~/exportIssCSV" + "{:%d%b%Y_%Hh%Mm}".format(date) + ".csv",
                     "CSV files (*.csv)")
                 if fileName:
                     with open(fileName, "w") as csv_file:
@@ -828,7 +830,8 @@ class Main(QMainWindow):
             QMessageBox.information(
                 self, "Info", "Nothing selected for export\nUse checkboxes to select issues to export")
 
-    def funcPeopleToCSV(self, indices):
+    def funcPeopleToCSV(self):
+        indices = self.funcPeopleCheckBox()
         # Check if there are any selected items
         if indices:
             try:
@@ -836,7 +839,7 @@ class Main(QMainWindow):
 
                 # Get file location and add timestamp to when it was created to the filename
                 fileName, _ = QFileDialog.getSaveFileName(
-                    self, "Save as...", "~/exportPplCSV" + "{:%d%b%Y %Hh%Mm}".format(date) + ".csv",
+                    self, "Save as...", "~/exportPplCSV" + "{:%d%b%Y_%Hh%Mm}".format(date) + ".csv",
                     "CSV files (*.csv)")
                 if fileName:
                     with open(fileName, "w") as csv_file:
@@ -857,7 +860,8 @@ class Main(QMainWindow):
             QMessageBox.information(
                 self, "Info", "Nothing selected for export\nUse checkboxes to select people to export")
 
-    def funcFacilitiesToCSV(self, indices):
+    def funcFacilitiesToCSV(self):
+        indices = self.funcFacilitiesCheckBox()
         # Check if there are any selected items
         if indices:
             try:
@@ -865,7 +869,7 @@ class Main(QMainWindow):
 
                 # Get file location and add timestamp to when it was created to the filename
                 fileName, _ = QFileDialog.getSaveFileName(
-                    self, "Save as...", "~/exportFclCSV" + "{:%d%b%Y %Hh%Mm}".format(date) + ".csv",
+                    self, "Save as...", "~/exportFclCSV" + "{:%d%b%Y_%Hh%Mm}".format(date) + ".csv",
                     "CSV files (*.csv)")
                 if fileName:
                     with open(fileName, "w") as csv_file:
@@ -887,9 +891,48 @@ class Main(QMainWindow):
                 self, "Info", "Nothing selected for export\nUse checkboxes to select facilities to export")
 
     # Export to XLSX
-    def funcIssuestoXLSX(self, indices):
-        
+    def funcIssuestoXLSX(self):
+        indices = self.funcIssuesCheckBox()
 
+        if indices:
+            try:
+                date = datetime.datetime.now()
+
+                # Get file location and add timestamp to when it was created to the filename
+                fileName, _ = QFileDialog.getSaveFileName(
+                    self, "Save as...", "~/exportIssXLSX" + "{:%d%b%Y_%Hh%Mm}".format(date) + ".xlsx",
+                    "Excel files (*.xlsx)")
+                if fileName:
+                    db.cur.execute("SELECT * FROM issues")
+
+                    workbook = xlsxwriter.Workbook(fileName)
+                    worksheet = workbook.add_worksheet("Issues")
+
+                    # Create header row
+                    col = 0
+                    for value in db.cur.description:
+                        worksheet.write(0, col, value[0])
+                        col += 1
+
+                    # Write date to xlsx file
+                    for index in range(len(indices)):
+                        query = "SELECT * FROM issues WHERE issue_id=?"
+                        issue_record = db.cur.execute(query, (indices[index],)).fetchone()
+
+                        row = 1
+                        for i, value in enumerate(issue_record):
+                            worksheet.write(row, i, value)
+                        row += 1
+
+                    workbook.close()
+
+                    QMessageBox.information(self, "Info", "Data exported successfully into {}".format(fileName))
+
+            except:
+                QMessageBox.information(self, "Info", "Export failed")
+        else:
+            QMessageBox.information(
+                self, "Info", "Nothing selected for export\nUse checkboxes to select issues to export")
 
     # def populateDummyData(self):
     #     queryIssues = "INSERT INTO issues (" \

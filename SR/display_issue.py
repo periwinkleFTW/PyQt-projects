@@ -140,6 +140,7 @@ class DisplayIssue(QWidget):
     def updateIssue(self):
         row = self.Parent.issuesTable.currentRow()
         issueId = self.Parent.issuesTable.item(row, 0).text()
+        issueId = issueId.lstrip("ISS#")
 
         date = self.dateEntry.text()
         priority = self.priorityEntry.text()
