@@ -152,8 +152,10 @@ class Main(QMainWindow):
         self.viewPerson.clicked.connect(self.selectedPerson)
         self.deletePerson = QPushButton("Delete person")
         self.deletePerson.clicked.connect(self.funcDeletePerson)
-        self.exportPeopleBtn = QPushButton("Export CSV")
-        self.exportPeopleBtn.clicked.connect(self.funcPeopleToCSV)
+        self.exportPeopleCSVBtn = QPushButton("Export CSV")
+        self.exportPeopleCSVBtn.clicked.connect(self.funcPeopleToCSV)
+        self.exportPeopleXLSXBtn = QPushButton("Export XLSX")
+        self.exportPeopleXLSXBtn.clicked.connect(self.funcPeopleToXLSX)
 
         # Tab 3 (Facilities) widgets ###########################################################
         # Top layout (search facilities) widgets
@@ -200,8 +202,10 @@ class Main(QMainWindow):
         self.viewFacility.clicked.connect(self.selectedFacility)
         self.deleteFacility = QPushButton("Delete facility")
         self.deleteFacility.clicked.connect(self.funcDeleteFacility)
-        self.exportFacilitiesBtn = QPushButton("Export")
-        self.exportFacilitiesBtn.clicked.connect(self.funcFacilitiesToCSV)
+        self.exportFacilitiesCSVBtn = QPushButton("Export CSV")
+        self.exportFacilitiesCSVBtn.clicked.connect(self.funcFacilitiesToCSV)
+        self.exportFacilitiesXSLXBtn = QPushButton("Export XLSX")
+        self.exportFacilitiesXSLXBtn.clicked.connect(self.funcFacilitiesToXLSX)
 
         # Tab 4 (Statistics) widgets ###########################################################
         self.totalIssuesLabel = QLabel()
@@ -313,7 +317,8 @@ class Main(QMainWindow):
         self.peopleBottomRightLayout.addWidget(self.addPerson, 5)
         self.peopleBottomRightLayout.addWidget(self.viewPerson, 5)
         self.peopleBottomRightLayout.addWidget(self.deletePerson, 5)
-        self.peopleBottomRightLayout.addWidget(self.exportPeopleBtn, 5)
+        self.peopleBottomRightLayout.addWidget(self.exportPeopleCSVBtn, 5)
+        self.peopleBottomRightLayout.addWidget(self.exportPeopleXLSXBtn, 5)
         self.peopleBottomRightLayout.addWidget(self.peopleBottomRightGroupBoxFiller, 70)
         self.peopleBottomRightGroupBox.setLayout(self.peopleBottomRightLayout)
 
@@ -368,7 +373,8 @@ class Main(QMainWindow):
         self.facilitiesBottomRightLayout.addWidget(self.addFacility, 5)
         self.facilitiesBottomRightLayout.addWidget(self.viewFacility, 5)
         self.facilitiesBottomRightLayout.addWidget(self.deleteFacility, 5)
-        self.facilitiesBottomRightLayout.addWidget(self.exportFacilitiesBtn, 5)
+        self.facilitiesBottomRightLayout.addWidget(self.exportFacilitiesCSVBtn, 5)
+        self.facilitiesBottomRightLayout.addWidget(self.exportFacilitiesXSLXBtn, 5)
         self.facilitiesBottomRightLayout.addWidget(self.facilitiesBottomRightGroupBoxFiller, 70)
         self.facilitiesBottomRightGroupBox.setLayout(self.facilitiesBottomRightLayout)
 
@@ -890,7 +896,7 @@ class Main(QMainWindow):
             QMessageBox.information(
                 self, "Info", "Nothing selected for export\nUse checkboxes to select facilities to export")
 
-    # Export to XLSX
+    # Export to XLSX functions
     def funcIssuestoXLSX(self):
         indices = self.funcIssuesCheckBox()
 
@@ -921,6 +927,93 @@ class Main(QMainWindow):
 
                         row = 1
                         for i, value in enumerate(issue_record):
+                            worksheet.write(row, i, value)
+                        row += 1
+
+                    workbook.close()
+
+                    QMessageBox.information(self, "Info", "Data exported successfully into {}".format(fileName))
+
+            except:
+                QMessageBox.information(self, "Info", "Export failed")
+        else:
+            QMessageBox.information(
+                self, "Info", "Nothing selected for export\nUse checkboxes to select issues to export")
+
+    def funcPeopleToXLSX(self):
+        indices = self.funcPeopleCheckBox()
+
+        if indices:
+            try:
+                date = datetime.datetime.now()
+
+                # Get file location and add timestamp to when it was created to the filename
+                fileName, _ = QFileDialog.getSaveFileName(
+                    self, "Save as...", "~/exportPrnXLSX" + "{:%d%b%Y_%Hh%Mm}".format(date) + ".xlsx",
+                    "Excel files (*.xlsx)")
+                if fileName:
+                    db.cur.execute("SELECT * FROM people")
+
+                    workbook = xlsxwriter.Workbook(fileName)
+                    worksheet = workbook.add_worksheet("People")
+
+                    # Create header row
+                    col = 0
+                    for value in db.cur.description:
+                        worksheet.write(0, col, value[0])
+                        col += 1
+
+                    # Write date to xlsx file
+                    for index in range(len(indices)):
+                        query = "SELECT * FROM people WHERE person_id=?"
+                        person_record = db.cur.execute(query, (indices[index],)).fetchone()
+
+                        row = 1
+                        for i, value in enumerate(person_record):
+                            worksheet.write(row, i, value)
+                        row += 1
+
+                    workbook.close()
+
+                    QMessageBox.information(self, "Info", "Data exported successfully into {}".format(fileName))
+
+            except:
+                QMessageBox.information(self, "Info", "Export failed")
+        else:
+            QMessageBox.information(
+                self, "Info", "Nothing selected for export\nUse checkboxes to select issues to export")
+
+
+    def funcFacilitiesToXLSX(self):
+        indices = self.funcFacilitiesCheckBox()
+
+        if indices:
+            try:
+                date = datetime.datetime.now()
+
+                # Get file location and add timestamp to when it was created to the filename
+                fileName, _ = QFileDialog.getSaveFileName(
+                    self, "Save as...", "~/exportFclXLSX" + "{:%d%b%Y_%Hh%Mm}".format(date) + ".xlsx",
+                    "Excel files (*.xlsx)")
+                if fileName:
+                    db.cur.execute("SELECT * FROM facilities")
+
+                    workbook = xlsxwriter.Workbook(fileName)
+                    worksheet = workbook.add_worksheet("Facilities")
+
+                    # Create header row
+                    col = 0
+                    for value in db.cur.description:
+                        worksheet.write(0, col, value[0])
+                        col += 1
+
+                    # Write date to xlsx file
+                    for index in range(len(indices)):
+                        query = "SELECT * FROM facilities WHERE facility_id=?"
+                        facility_record = db.cur.execute(query, (indices[index],)).fetchone()
+
+                        row = 1
+                        for i, value in enumerate(facility_record):
                             worksheet.write(row, i, value)
                         row += 1
 
