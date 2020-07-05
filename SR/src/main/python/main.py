@@ -16,6 +16,8 @@ from PySide2.QtWidgets import QApplication, QMainWindow, QTabWidget, QWidget, QL
     QRadioButton, QTableWidget, QTableWidgetItem, QVBoxLayout, QHBoxLayout, QGroupBox, QTableView, \
     QAbstractItemView, QMessageBox, QHeaderView, QCheckBox, QFileDialog
 
+from fbs_runtime.application_context.PySide2 import ApplicationContext
+
 db = backend.Database("sr-data.db")
 
 
@@ -1059,11 +1061,16 @@ class Main(QMainWindow):
 
 
 def main():
-    app = QApplication(sys.argv)
-    window = Main()
-    sys.exit(app.exec_())
+    # app = QApplication(sys.argv)
+    # window = Main()
+    # sys.exit(app.exec_())
 
-
+    # Code for fman packaging
+    appctxt = ApplicationContext()       # 1. Instantiate ApplicationContext
+    window = QMainWindow()
+    window.show()
+    exit_code = appctxt.app.exec_()      # 2. Invoke appctxt.app.exec_()
+    sys.exit(exit_code)
 
 
 if __name__ == "__main__":
