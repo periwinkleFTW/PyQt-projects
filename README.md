@@ -1,2 +1,2 @@
-# PyQt-projects
-PyQt5 projects
+# PySide2-projects
+This is my GUI python app 
